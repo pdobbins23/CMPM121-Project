@@ -21,7 +21,12 @@ public class EventBus
     public event Action OnCast;
     public void DoCast() => OnCast?.Invoke();
 
-    public event Action OnMove;
+
+    public event Action OnCast;
+
+public event Action<float> OnMove; // provide distance moved
+public void DoMove(float distance) => OnMove?.Invoke(distance);
+
 public void DoMove() => OnMove?.Invoke();
 
     

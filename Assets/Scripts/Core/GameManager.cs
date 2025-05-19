@@ -41,6 +41,13 @@ public class GameManager
     private List<GameObject> enemies;
     public int enemy_count { get { return enemies.Count; } }
 
+    public event Action OnWaveStart;
+    public void StartNextWave() {
+        OnWaveStart?.Invoke();
+    // wave logic here...
+}
+
+
     public void AddEnemy(GameObject enemy)
     {
         enemies.Add(enemy);

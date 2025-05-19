@@ -69,24 +69,25 @@ public class Relic
 
     private void RegisterTrigger()
     {
-        switch (data.trigger.type)
+switch (data.trigger.type)
+{
+    case "on-cast":
+        EventBus.Instance.OnCast += () => ApplyEffect();
+        break;
+
+    case "move-distance":
+        Player.Instance.OnMove += (distance) =>
         {
-            case "take-damage":
-                EventBus.Instance.OnDamage += (where, dmg, target) =>
-                {
-                    ApplyEffect();
-                };
-                break;
+            if (distance >= float.Parse(data.trigger.amount))
+                ApplyEffect();
+        };
+        break;
 
-            case "on-kill":
-                EventBus.Instance.OnKill += () =>
-                {
-                    ApplyEffect();
-                };
-                break;
+    case "wave-start":
+        GameManager.Instance.OnWaveStart += () => ApplyEffect();
+        break;
+}
 
-            // stand-still handled in Update()
-        }
 
         if (data.effect.until == "cast-spell")
         {
@@ -112,6 +113,12 @@ public class Relic
                 Player.Instance.AddSpellPowerBuff(amount); // You handle this
                 effectActive = true;
                 break;
+
+            case "gain-max-health":
+            if (int.TryParse(data.effect.amount, out int hp))
+                Player.Instance.IncreaseMaxHP(hp); // You implement this
+                break;
+
         }
     }
 
