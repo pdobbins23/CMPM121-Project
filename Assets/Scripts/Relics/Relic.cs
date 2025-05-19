@@ -1,6 +1,6 @@
 using UnityEngine;
+using System;
 
-// Root data class parsed from relics.json
 [System.Serializable]
 public class RelicData
 {
@@ -10,90 +10,136 @@ public class RelicData
     public RelicEffectData effect;
 }
 
-// Trigger information parsed from JSON
 [System.Serializable]
 public class RelicTriggerData
 {
     public string description;
     public string type;
-    public string amount;  // Optional, used in "stand-still" and custom triggers
+    public string amount;  // Optional
 }
 
-// Effect information parsed from JSON
 [System.Serializable]
 public class RelicEffectData
 {
     public string description;
     public string type;
     public string amount;
-    public string until;  // Optional, used for temporary effects (e.g. "until": "cast-spell")
+    public string until; // Optional
 }
 
-// Main runtime object that holds the parsed relic and connects the trigger and effect
 public class Relic
 {
     public string Name { get; private set; }
     public Sprite Icon { get; private set; }
 
-    public IRelicTrigger Trigger { get; private set; }
-    public IRelicEffect Effect { get; private set; }
+    private RelicData data;
+    private bool effectActive = false;
+    private float timer = 0f;
 
-    public Relic(RelicData data)
+    public Relic(RelicData relicData)
     {
-        Name = data.name;
-        Icon = SpriteManager.GetSpriteById(data.sprite); // Implement SpriteManager yourself
+        data = relicData;
+        Name = relicData.name;
+        Icon = SpriteManager.GetSpriteById(data.sprite);
+        RegisterTrigger();
+    }
 
-        Effect = EffectFactory.Create(data.effect);
-        Trigger = TriggerFactory.Create(data.trigger);
-
-        if (Trigger != null)
+    public void Update()
+    {
+        if (data.trigger.type == "stand-still")
         {
-            Trigger.Register(this);
+            if (!Player.Instance.IsMoving())
+            {
+                timer += Time.deltaTime;
+                if (!effectActive && timer >= float.Parse(data.trigger.amount))
+                {
+                    ApplyEffect();
+                    effectActive = true;
+                }
+            }
+            else
+            {
+                if (effectActive)
+                    RemoveEffectIfNeeded();
+                timer = 0f;
+                effectActive = false;
+            }
         }
     }
-}
 
-// Trigger interface
-public interface IRelicTrigger
-{
-    void Register(Relic relic);  // Attach trigger to an event
-}
-
-// Effect interface
-public interface IRelicEffect
-{
-    void ApplyEffect();
-    void RemoveEffectIfNeeded();
-}
-
-// Placeholder factories (to be filled with logic later)
-public static class TriggerFactory
-{
-    public static IRelicTrigger Create(RelicTriggerData data)
+    private void RegisterTrigger()
     {
-        switch (data.type)
+        switch (data.trigger.type)
         {
-            case "take-damage": return new TakeDamageTrigger();
-            case "stand-still": return new StandStillTrigger(float.Parse(data.amount));
-            case "on-kill": return new OnKillTrigger();
-            default:
-                Debug.LogWarning("Unknown trigger type: " + data.type);
-                return null;
+            case "take-damage":
+                EventBus.Instance.OnDamage += (where, dmg, target) =>
+                {
+                    ApplyEffect();
+                };
+                break;
+
+            case "on-kill":
+                EventBus.Instance.OnKill += () =>
+                {
+                    ApplyEffect();
+                };
+                break;
+
+            // stand-still handled in Update()
+        }
+
+        if (data.effect.until == "cast-spell")
+        {
+            EventBus.Instance.OnCast += () => RemoveEffectIfNeeded();
+        }
+        else if (data.effect.until == "move")
+        {
+            EventBus.Instance.OnMove += () => RemoveEffectIfNeeded();
         }
     }
-}
 
-public static class EffectFactory
-{
-    public static IRelicEffect Create(RelicEffectData data)
+    private void ApplyEffect()
     {
-        switch (data.type)
+        switch (data.effect.type)
         {
-            case "gain-mana": return new GainManaEffect(data.amount);
-            case "gain-spellpower": return new GainSpellPowerEffect(data.amount, data.until);
-            default:
-                Debug.LogWarning("Unknown effect type: " + data.type);
-                return null;
+            case "gain-mana":
+                if (int.TryParse(data.effect.amount, out int mana))
+                    Player.Instance.AddMana(mana);
+                break;
+
+            case "gain-spellpower":
+                int amount = EvaluateAmount(data.effect.amount);
+                Player.Instance.AddSpellPowerBuff(amount); // You handle this
+                effectActive = true;
+                break;
+        }
+    }
+
+    private void RemoveEffectIfNeeded()
+    {
+        if (effectActive && data.effect.type == "gain-spellpower")
+        {
+            int amount = EvaluateAmount(data.effect.amount);
+            Player.Instance.RemoveSpellPowerBuff(amount);
+            effectActive = false;
+        }
+    }
+
+    private int EvaluateAmount(string expr)
+    {
+        // Handles e.g., "10 wave 5 * +"
+        if (expr.Contains("wave"))
+        {
+            string[] parts = expr.Split(' ');
+            int baseVal = int.TryParse(parts[0], out int b) ? b : 0;
+            int mult = int.TryParse(parts[2], out int m) ? m : 0;
+            int wave = GameManager.Instance.CurrentWave;
+            return baseVal + (wave * mult);
+        }
+        else
+        {
+            int.TryParse(expr, out int val);
+            return val;
         }
     }
 }
