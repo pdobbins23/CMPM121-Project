@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 public class RelicManager
 {
     public List<RelicData> AllRelics = new List<RelicData>();
+    public List<Relic> activeRelics = new List<Relic>();
 
     private static RelicManager theInstance;
     public static RelicManager Instance
@@ -35,9 +36,9 @@ public class RelicManager
 
     void Update()
     {
-    foreach (var relic in activeRelics)
-    {
-        relic.Update();
-    }
+        foreach (var relic in activeRelics)
+        {
+            relic.Update();
+        }
     }
 }

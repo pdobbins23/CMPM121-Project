@@ -69,25 +69,24 @@ public class Relic
 
     private void RegisterTrigger()
     {
-switch (data.trigger.type)
-{
-    case "on-cast":
-        EventBus.Instance.OnCast += () => ApplyEffect();
-        break;
-
-    case "move-distance":
-        Player.Instance.OnMove += (distance) =>
+        switch (data.trigger.type)
         {
-            if (distance >= float.Parse(data.trigger.amount))
-                ApplyEffect();
-        };
-        break;
+            case "on-cast":
+                EventBus.Instance.OnCast += () => ApplyEffect();
+                break;
 
-    case "wave-start":
-        GameManager.Instance.OnWaveStart += () => ApplyEffect();
-        break;
-}
+            case "move-distance":
+                Player.Instance.OnMove += (distance) =>
+                {
+                    if (distance >= float.Parse(data.trigger.amount))
+                        ApplyEffect();
+                };
+                break;
 
+            case "wave-start":
+                GameManager.Instance.OnWaveStart += () => ApplyEffect();
+                break;
+        }
 
         if (data.effect.until == "cast-spell")
         {
@@ -95,7 +94,7 @@ switch (data.trigger.type)
         }
         else if (data.effect.until == "move")
         {
-            EventBus.Instance.OnMove += () => RemoveEffectIfNeeded();
+            EventBus.Instance.OnMove += (distance) => RemoveEffectIfNeeded();
         }
     }
 
@@ -134,19 +133,9 @@ switch (data.trigger.type)
 
     private int EvaluateAmount(string expr)
     {
-        // Handles e.g., "10 wave 5 * +"
-        if (expr.Contains("wave"))
-        {
-            string[] parts = expr.Split(' ');
-            int baseVal = int.TryParse(parts[0], out int b) ? b : 0;
-            int mult = int.TryParse(parts[2], out int m) ? m : 0;
-            int wave = GameManager.Instance.CurrentWave;
-            return baseVal + (wave * mult);
-        }
-        else
-        {
-            int.TryParse(expr, out int val);
-            return val;
-        }
+        var pc = GameManager.Instance.player.GetComponent<PlayerController>();
+        var ctx = pc.spellcaster.GetContext().ToDictionary();
+
+        return (int) RPN.eval(expr, ctx);
     }
 }
