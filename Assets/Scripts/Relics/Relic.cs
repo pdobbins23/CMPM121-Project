@@ -30,25 +30,27 @@ public class RelicEffectData
 public class Relic
 {
     public string Name { get; private set; }
-    public Sprite Icon { get; private set; }
+    // public Sprite Icon { get; private set; }
 
     private RelicData data;
     private bool effectActive = false;
     private float timer = 0f;
+    private PlayerController player;
 
     public Relic(RelicData relicData)
     {
         data = relicData;
         Name = relicData.name;
-        Icon = SpriteManager.GetSpriteById(data.sprite);
+        // Icon = RelicIconManager.GetSpriteById(data.sprite);
         RegisterTrigger();
+        player = GameManager.Instance.player.GetComponent<PlayerController>();
     }
 
     public void Update()
     {
         if (data.trigger.type == "stand-still")
         {
-            if (!Player.Instance.IsMoving())
+            if (GameManager.Instance.player.GetComponent<Rigidbody>().linearVelocity.sqrMagnitude < 1)
             {
                 timer += Time.deltaTime;
                 if (!effectActive && timer >= float.Parse(data.trigger.amount))
@@ -76,7 +78,7 @@ public class Relic
                 break;
 
             case "move-distance":
-                Player.Instance.OnMove += (distance) =>
+                EventBus.Instance.OnMove += (distance) =>
                 {
                     if (distance >= float.Parse(data.trigger.amount))
                         ApplyEffect();
@@ -104,18 +106,18 @@ public class Relic
         {
             case "gain-mana":
                 if (int.TryParse(data.effect.amount, out int mana))
-                    Player.Instance.AddMana(mana);
+                    player.spellcaster.AddMana(mana);
                 break;
 
             case "gain-spellpower":
                 int amount = EvaluateAmount(data.effect.amount);
-                Player.Instance.AddSpellPowerBuff(amount); // You handle this
+                player.spellcaster.spell_power += amount;
                 effectActive = true;
                 break;
 
             case "gain-max-health":
-            if (int.TryParse(data.effect.amount, out int hp))
-                Player.Instance.IncreaseMaxHP(hp); // You implement this
+                if (int.TryParse(data.effect.amount, out int hp))
+                    player.hp.SetMaxHP(player.hp.max_hp + hp);
                 break;
 
         }
@@ -126,16 +128,14 @@ public class Relic
         if (effectActive && data.effect.type == "gain-spellpower")
         {
             int amount = EvaluateAmount(data.effect.amount);
-            Player.Instance.RemoveSpellPowerBuff(amount);
+            player.spellcaster.spell_power -= amount;
             effectActive = false;
         }
     }
 
     private int EvaluateAmount(string expr)
     {
-        var pc = GameManager.Instance.player.GetComponent<PlayerController>();
-        var ctx = pc.spellcaster.GetContext().ToDictionary();
-
+        var ctx = player.spellcaster.GetContext().ToDictionary();
         return (int) RPN.eval(expr, ctx);
     }
 }

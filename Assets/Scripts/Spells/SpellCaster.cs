@@ -16,8 +16,7 @@ public class SpellCaster
     {
         while (true)
         {
-            mana += mana_reg;
-            mana = Mathf.Min(mana, max_mana);
+            AddMana(mana_reg);
             
             yield return new WaitForSeconds(1);
         }
@@ -29,6 +28,11 @@ public class SpellCaster
         this.max_mana = mana;
         this.mana_reg = mana_reg;
         this.team = team;
+    }
+
+    public void AddMana(int added_mana)
+    {
+        mana = Mathf.Min(mana + added_mana, max_mana);
     }
 
     public IEnumerator Cast(int index, Vector3 where, Vector3 target)
