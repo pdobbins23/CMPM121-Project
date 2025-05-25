@@ -14,8 +14,7 @@ public class AcceptRewardButton : MonoBehaviour
         if (player.spells.Count < 4)
         {
             player.spells.Add(rewardSpell);
-            playerObj.spellui[player.spells.Count - 1].SetActive(true);
-            playerObj.spellui[player.spells.Count - 1].GetComponent<SpellUI>().SetSpell(rewardSpell);
+            playerObj.UpdateSpellUi();
 
 			foreach (var btn in dropButtons)
 			{

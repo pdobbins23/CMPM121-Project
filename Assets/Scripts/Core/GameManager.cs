@@ -56,6 +56,14 @@ public class GameManager
     {
         enemies.Remove(enemy);
     }
+    public void KillAllEnemies()
+    {
+        foreach (var enemy in enemies.ToList())
+        {
+            var hp = enemy.GetComponent<EnemyController>().hp;
+            hp.Damage(new Damage(hp.hp, Damage.Type.DARK));
+        }
+    }
 
     public GameObject GetClosestEnemy(Vector3 point)
     {

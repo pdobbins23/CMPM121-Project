@@ -27,6 +27,11 @@ public class SpellUI : MonoBehaviour
         GameManager.Instance.spellIconManager.PlaceSprite(spell.GetIcon(), icon.GetComponent<Image>());
     }
 
+    public void SetHighlight(Color color)
+    {
+        highlight.GetComponent<Image>().color = color;
+    }
+
     // Update is called once per frame
     void Update()
     {
