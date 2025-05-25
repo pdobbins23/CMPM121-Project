@@ -44,6 +44,7 @@ public class SpellCaster
         if (mana >= manaCost && spell.IsReady())
         {
             mana -= manaCost;
+            EventBus.Instance.DoCast();
             yield return spell.Cast(where, target, team);
         }
         

@@ -35,6 +35,7 @@ public class Relic
     private RelicData data;
     private bool effectActive = false;
     private float timer = 0f;
+    private float distancedMoved = 0;
     private PlayerController player;
 
     public Relic(RelicData relicData)
@@ -80,8 +81,12 @@ public class Relic
             case "move-distance":
                 EventBus.Instance.OnMove += (distance) =>
                 {
-                    if (distance >= float.Parse(data.trigger.amount))
+                    distancedMoved += distance;
+                    if (distancedMoved >= float.Parse(data.trigger.amount))
+                    {
+                        distancedMoved = 0;
                         ApplyEffect();
+                    }
                 };
                 break;
 
