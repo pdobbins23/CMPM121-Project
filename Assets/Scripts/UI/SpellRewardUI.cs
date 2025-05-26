@@ -64,7 +64,7 @@ public class SpellRewardUI : MonoBehaviour
                 .Where(data => !chosenRelics.Any(chosen => chosen.name == data.name))
                 .ToList();
 
-            if (eligible.Count() == 0) {
+            if (eligible.Count() == 0 || GameManager.Instance.currentWave % 3 != 0) {
                 relicIcons[i].SetActive(false);
                 relicDescs[i].SetActive(false);
                 takeRelicButtons[i].SetActive(false);

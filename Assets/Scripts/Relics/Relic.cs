@@ -78,6 +78,20 @@ public class Relic
                 EventBus.Instance.OnCast += () => ApplyEffect();
                 break;
 
+            case "take-damage":
+                EventBus.Instance.OnDamage += (where, damage, target) =>
+                {
+                    if (target.owner == GameManager.Instance.player) ApplyEffect();
+                };
+                break;
+
+            case "on-kill":
+                EventBus.Instance.OnKill += (target) =>
+                {
+                    if (target.owner != GameManager.Instance.player) ApplyEffect();
+                };
+                break;
+
             case "move-distance":
                 EventBus.Instance.OnMove += (distance) =>
                 {

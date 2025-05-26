@@ -14,8 +14,8 @@ public class EventBus
         }
     }
 
-    public event Action OnKill;
-    public void DoKill() => OnKill?.Invoke();
+    public event Action<Hittable> OnKill;
+    public void DoKill(Hittable target) => OnKill?.Invoke(target);
 
     public event Action OnCast;
     public void DoCast() => OnCast?.Invoke();
