@@ -13,13 +13,14 @@ public class SpellRewardUI : MonoBehaviour
 
     public GameObject[] relicIcons;
     public GameObject[] relicDescs;
+    public GameObject[] takeRelicButtons;
 
     public GameObject[] dropButtons = new GameObject[4];
     public Button declineButton;
     public Button acceptButton;
 
     public Spell rewardSpell;
-    public Relic[3] relics = new Relic[3];
+    public Relic[] relics = new Relic[3];
     private SpellCaster player;
     public PlayerController playerObj;
 

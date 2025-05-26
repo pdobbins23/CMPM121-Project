@@ -7787,7 +7787,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1709288112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7883,6 +7883,10 @@ MonoBehaviour:
   - {fileID: 199056586}
   - {fileID: 1485558448}
   - {fileID: 767089390}
+  takeRelicButtons:
+  - {fileID: 698261866}
+  - {fileID: 338553437}
+  - {fileID: 1353438087}
   dropButtons:
   - {fileID: 672798488}
   - {fileID: 426128245}
