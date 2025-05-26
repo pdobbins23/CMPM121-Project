@@ -13,23 +13,23 @@ public class TakeRelicButton : MonoBehaviour
 
 		// make sure player doesn't already have this relic
 		foreach (var r in playerObj.spellcaster.activeRelics) {
-			if (r.Name == relic.Name) {
+			if (r.Name == relic.name) {
 				return;
 			}
 		}
 
-		playerObj.spellcaster.activeRelics.Add(relic);
+		playerObj.spellcaster.activeRelics.Add(new Relic(relic));
 
 		foreach (var btn in rewardUi.takeRelicButtons) {
 			btn.SetActive(false);
 		}
 
 		foreach (var icon in rewardUi.relicIcons) {
-			icon.SetActive(false);
+			icon.gameObject.SetActive(false);
 		}
 
 		foreach (var desc in rewardUi.relicDescs) {
-			desc.SetActive(false);
+			desc.gameObject.SetActive(false);
 		}
 	}
 }

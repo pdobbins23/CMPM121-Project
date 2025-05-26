@@ -11,16 +11,16 @@ public class SpellRewardUI : MonoBehaviour
     public TextMeshProUGUI spellDescText;
     public Image iconImage;
 
-    public GameObject[] relicIcons;
-    public GameObject[] relicDescs;
-    public GameObject[] takeRelicButtons;
+    public Image[] relicIcons = new Image[3];
+    public TextMeshProUGUI[] relicDescs = new TextMeshProUGUI[3];
+    public GameObject[] takeRelicButtons = new GameObject[3];
 
     public GameObject[] dropButtons = new GameObject[4];
     public Button declineButton;
     public Button acceptButton;
 
     public Spell rewardSpell;
-    public Relic[] relics = new Relic[3];
+    public RelicData[] relics = new RelicData[3];
     private SpellCaster player;
     public PlayerController playerObj;
 
@@ -55,7 +55,19 @@ public class SpellRewardUI : MonoBehaviour
             }
         }
 
-        // TODO: Randomly select new relics and update UI
+        var rnd = new System.Random();
+        var ar = RelicManager.Instance.AllRelics;
+
+        for (int i = 0; i < 3; i++) {
+            relics[i] = ar[rnd.Next(ar.Count)];
+
+            relicIcons[i].gameObject.SetActive(true);
+            relicDescs[i].gameObject.SetActive(true);
+            takeRelicButtons[i].SetActive(true);
+
+            // TODO: Set the image of relicIcons[i]
+            relicDescs[i].text = relics[i].trigger.description + ", " + relics[i].effect.description;
+        }
 
         panel.SetActive(true);
     }
