@@ -8,6 +8,8 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
+    public PlayerClass playerClass;
+    
     public Hittable hp;
     public HealthBar healthui;
     public ManaBar manaui;
