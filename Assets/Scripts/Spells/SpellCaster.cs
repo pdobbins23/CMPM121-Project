@@ -12,6 +12,8 @@ public class SpellCaster
     public float spell_power = 10f;
     public List<Spell> spells = new List<Spell>();
 
+    public List<Relic> activeRelics = new List<Relic>();
+
     public IEnumerator ManaRegeneration()
     {
         while (true)

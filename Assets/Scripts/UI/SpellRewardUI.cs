@@ -11,11 +11,15 @@ public class SpellRewardUI : MonoBehaviour
     public TextMeshProUGUI spellDescText;
     public Image iconImage;
 
+    public GameObject[] relicIcons;
+    public GameObject[] relicDescs;
+
     public GameObject[] dropButtons = new GameObject[4];
     public Button declineButton;
     public Button acceptButton;
 
     public Spell rewardSpell;
+    public Relic[3] relics = new Relic[3];
     private SpellCaster player;
     public PlayerController playerObj;
 
@@ -49,6 +53,8 @@ public class SpellRewardUI : MonoBehaviour
                 btn.SetActive(true);
             }
         }
+
+        // TODO: Randomly select new relics and update UI
 
         panel.SetActive(true);
     }

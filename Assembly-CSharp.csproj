@@ -77,6 +77,7 @@
     <Compile Include="Assets/Scripts/UI/RelicUI.cs" />
     <Compile Include="Assets/Scripts/Spells/AcceptRewardButton.cs" />
     <Compile Include="Assets/Scripts/Projectiles/HomingProjectileMovement.cs" />
+    <Compile Include="Assets/Scripts/Relics/TakeRelicButton.cs" />
     <Compile Include="Assets/Scripts/Spells/SpellBuilder.cs" />
     <Compile Include="Assets/Scripts/UI/RelicUIManager.cs" />
     <Compile Include="Assets/Scripts/SpriteManagement/IconManager.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Assets/Scripts/UI/WaveButton.cs" />
     <Compile Include="Assets/Scripts/UI/MenuSelectorController.cs" />
     <Compile Include="Assets/Scripts/Projectiles/ProjectileController.cs" />
+    <Compile Include="Assets/Scripts/Relics/Relic.cs" />
     <Compile Include="Assets/Scripts/Levels/Levels.cs" />
     <Compile Include="Assets/Scripts/DamageSystem/Damage.cs" />
     <Compile Include="Assets/Scripts/Enemies/EnemyManager.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Assets/Scripts/UI/WaveLabelController.cs" />
     <Compile Include="Assets/Scripts/Core/GameManager.cs" />
     <Compile Include="Assets/Scripts/Projectiles/SpiralingProjectileMovement.cs" />
+    <Compile Include="Assets/Scripts/Relics/RelicManager.cs" />
     <Compile Include="Assets/Scripts/UI/AnimateDamage.cs" />
     <Compile Include="Assets/Scripts/UI/SpellUIContainer.cs" />
     <Compile Include="Assets/Scripts/Movement/Unit.cs" />
