@@ -88,6 +88,7 @@
     <Compile Include="Assets/Scripts/Spells/Spell.cs" />
     <Compile Include="Assets/Scripts/Projectiles/ProjectileMovement.cs" />
     <Compile Include="Assets/Scripts/Utils/JsonUtils.cs" />
+    <Compile Include="Assets/Scripts/Classes/PlayerClassSelectorController.cs" />
     <Compile Include="Assets/Scripts/UI/HealthBar.cs" />
     <Compile Include="Assets/Scripts/Core/CoroutineManager.cs" />
     <Compile Include="Assets/Scripts/Utils/RPN.cs" />

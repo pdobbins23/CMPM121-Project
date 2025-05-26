@@ -11,8 +11,10 @@ using UnityEngine.SceneManagement;
 public class EnemySpawner : MonoBehaviour
 {
     public Image level_selector;
+    public Image class_selector;
     public GameObject relicui;
     public GameObject button;
+    public GameObject playerClassButton;
     public GameObject gameOverButton;
     public GameObject waveContinueButton;
     public GameObject enemy;
@@ -21,6 +23,11 @@ public class EnemySpawner : MonoBehaviour
 
     private GameObject continueBtn;
     private GameObject gameOverBtn;
+
+	public PlayerController player;
+
+	public GameObject playerClassSelector;
+	public GameObject difficultySelector;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -36,6 +43,16 @@ public class EnemySpawner : MonoBehaviour
         continueBtn.gameObject.SetActive(false);
         
         int i = 0;
+        foreach (var playerClassName in PlayerClassManager.Instance.playerClasses.Keys)
+        {
+            var playerClass = PlayerClassManager.Instance.playerClasses[playerClassName];
+            GameObject selector = Instantiate(playerClassButton, class_selector.transform);
+            selector.transform.localPosition = new Vector3(0, 130 + -50 * i);
+            selector.GetComponent<PlayerClassSelectorController>().spawner = this;
+            selector.GetComponent<PlayerClassSelectorController>().SetClass(playerClassName, playerClass);
+            i++;
+        }
+        i = 0;
         foreach (var level in LevelManager.Instance.levelTypes.Values) {
             GameObject selector = Instantiate(button, level_selector.transform);
             selector.transform.localPosition = new Vector3(0, 130 + -50 * i);
@@ -98,11 +115,11 @@ public class EnemySpawner : MonoBehaviour
             { "wave", GameManager.Instance.currentWave },
         };
 
-        pc.hp.hp = pc.hp.max_hp = RPN.eval(pc.playerClass.health, ctx);
-        pc.spellcaster.mana = RPN.eval(pc.playerClass.mana, ctx);
-        pc.spellcaster.mana_reg = RPN.eval(pc.playerClass.mana_regeneration, ctx);
-        pc.spellcaster.spell_power = RPN.eval(pc.playerClass.spellpower, ctx);
-        pc.speed = RPN.eval(pc.playerClass.speed, ctx);
+        pc.hp.hp = pc.hp.max_hp = RPN.EvalInt(pc.playerClass.health, ctx);
+        pc.spellcaster.mana = RPN.EvalInt(pc.playerClass.mana, ctx);
+        pc.spellcaster.mana_reg = RPN.EvalInt(pc.playerClass.mana_regeneration, ctx);
+        pc.spellcaster.spell_power = RPN.EvalInt(pc.playerClass.spellpower, ctx);
+        pc.speed = RPN.EvalInt(pc.playerClass.speed, ctx);
         
         StartCoroutine(SpawnWave());
     }

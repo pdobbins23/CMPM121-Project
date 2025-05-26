@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 public class PlayerClassManager
 {
-	public List<PlayerClass> playerClasses = new List<PlayerClass>();
+	public Dictionary<string, PlayerClass> playerClasses = new Dictionary<string, PlayerClass>();
 
 	private static PlayerClassManager theInstance;
 	public static PlayerClassManager Instance
@@ -26,10 +26,13 @@ public class PlayerClassManager
             return;
         }
 
-        JArray playerClassArray = JArray.Parse(jsonFile.text);
-        foreach (var playerClass in playerClassArray.Children<JObject>())
+		JToken jo = JToken.Parse(jsonFile.text);
+		
+        foreach (var playerClass in jo.Children<JProperty>())
         {
-            playerClasses.Add(playerClass.ToObject<PlayerClass>());
+			JObject obj = (JObject)playerClass.Value;
+			
+            playerClasses[playerClass.Name] = obj.ToObject<PlayerClass>();
         }
 	}
 }
