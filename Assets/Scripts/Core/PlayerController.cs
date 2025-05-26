@@ -68,6 +68,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSpell(2);
         if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSpell(3);
         if (Input.GetKeyDown(KeyCode.K)) GameManager.Instance.KillAllEnemies();
+        RelicManager.Instance.Update();
     }
 
     public void SelectSpell(int index) {

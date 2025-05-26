@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -49,16 +51,41 @@ public class SpellRewardUI : MonoBehaviour
 
         var rnd = new System.Random();
         var ar = RelicManager.Instance.AllRelics;
+        var r = RelicManager.Instance.ActiveRelics;
+
+        var availableRelics = ar
+            .Where(data => !r.Any(active => active.Name == data.name))
+            .ToList();
+
+        var chosenRelics = new List<RelicData>();
 
         for (int i = 0; i < 3; i++) {
-            relics[i] = ar[rnd.Next(ar.Count)];
+            var eligible = availableRelics
+                .Where(data => !chosenRelics.Any(chosen => chosen.name == data.name))
+                .ToList();
+
+            if (eligible.Count() == 0) {
+                relicIcons[i].SetActive(false);
+                relicDescs[i].SetActive(false);
+                takeRelicButtons[i].SetActive(false);
+                continue;
+            }
+
+            var chosen = eligible[rnd.Next(eligible.Count())];
+            chosenRelics.Add(chosen);
+            relics[i] = chosen;
 
             relicIcons[i].SetActive(true);
             relicDescs[i].SetActive(true);
             takeRelicButtons[i].SetActive(true);
 
-            // TODO: Set the image of relicIcons[i]
-            relicDescs[i].GetComponent<TextMeshProUGUI>().text = relics[i].trigger.description + ", " + relics[i].effect.description;
+            GameManager.Instance.relicIconManager.PlaceSprite(
+                chosen.sprite,
+                relicIcons[i].GetComponent<Image>()
+            );
+
+            relicDescs[i].GetComponent<TextMeshProUGUI>().text =
+                chosen.trigger.description + ", " + chosen.effect.description;
         }
 
         panel.SetActive(true);

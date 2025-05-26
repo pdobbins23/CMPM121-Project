@@ -51,7 +51,7 @@ public class Relic
     {
         if (data.trigger.type == "stand-still")
         {
-            if (GameManager.Instance.player.GetComponent<Rigidbody>().linearVelocity.sqrMagnitude < 1)
+            if (GameManager.Instance.player.GetComponent<Rigidbody2D>().linearVelocity.sqrMagnitude < 1)
             {
                 timer += Time.deltaTime;
                 if (!effectActive && timer >= float.Parse(data.trigger.amount))

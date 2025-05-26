@@ -53,5 +53,46 @@
             "type": "gain-mana",
             "amount": "25"
         }
+    },
+    {
+        "name": "Crimson Rune",
+        "sprite": 4,
+        "trigger": {
+            "description": "When the player casts a spell",
+            "type": "on-cast"
+        },
+        "effect": {
+            "description": "you gain 3 mana.",
+            "type": "gain-mana",
+            "amount": "3"
+        }
+    },
+    {
+        "name": "Silver Wind",
+        "sprite": 5,
+        "trigger": {
+            "description": "After moving 50 units",
+            "type": "move-distance",
+            "amount": "50"
+        },
+        "effect": {
+            "description": "your next spell gains 50 additional spellpower.",
+            "type": "gain-spellpower",
+            "amount": "50",
+            "until": "cast-spell"
+        }
+    },
+    {
+        "name": "Lucky Charm",
+        "sprite": 6,
+        "trigger": {
+            "description": "At the start of each wave",
+            "type": "wave-start"
+        },
+        "effect": {
+            "description": "you gain 10 max HP.",
+            "type": "gain-max-health",
+            "amount": "10"
+        }
     }
 ]
