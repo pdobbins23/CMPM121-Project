@@ -87,11 +87,22 @@ public class EnemySpawner : MonoBehaviour
     {
         var pc = GameManager.Instance.player.GetComponent<PlayerController>();
 
-        pc.hp.hp = pc.hp.max_hp = 95 + GameManager.Instance.currentWave * 5;
-        pc.spellcaster.mana = 90 + GameManager.Instance.currentWave * 10;
-        pc.spellcaster.mana_reg = GameManager.Instance.currentWave + 10;
-        pc.spellcaster.spell_power = GameManager.Instance.currentWave * 10;
-        pc.speed = 5;
+        // pc.hp.hp = pc.hp.max_hp = 95 + GameManager.Instance.currentWave * 5;
+        // pc.spellcaster.mana = 90 + GameManager.Instance.currentWave * 10;
+        // pc.spellcaster.mana_reg = GameManager.Instance.currentWave + 10;
+        // pc.spellcaster.spell_power = GameManager.Instance.currentWave * 10;
+        // pc.speed = 5;
+
+        var ctx = new Dictionary<string, float>
+        {
+            { "wave", GameManager.Instance.currentWave },
+        };
+
+        pc.hp.hp = pc.hp.max_hp = RPN.eval(pc.playerClass.health, ctx);
+        pc.spellcaster.mana = RPN.eval(pc.playerClass.mana, ctx);
+        pc.spellcaster.mana_reg = RPN.eval(pc.playerClass.mana_regeneration, ctx);
+        pc.spellcaster.spell_power = RPN.eval(pc.playerClass.spellpower, ctx);
+        pc.speed = RPN.eval(pc.playerClass.speed, ctx);
         
         StartCoroutine(SpawnWave());
     }
