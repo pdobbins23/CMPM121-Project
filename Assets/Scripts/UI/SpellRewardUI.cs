@@ -4,18 +4,16 @@ using TMPro;
 
 public class SpellRewardUI : MonoBehaviour
 {
-    public static SpellRewardUI Instance;
-
     public GameObject panel;
     public TextMeshProUGUI spellNameText;
     public TextMeshProUGUI spellDescText;
     public Image iconImage;
 
-    public Image[] relicIcons = new Image[3];
-    public TextMeshProUGUI[] relicDescs = new TextMeshProUGUI[3];
-    public GameObject[] takeRelicButtons = new GameObject[3];
+    public GameObject[] relicIcons;
+    public GameObject[] relicDescs;
+    public GameObject[] takeRelicButtons;
 
-    public GameObject[] dropButtons = new GameObject[4];
+    public GameObject[] dropButtons;
     public Button declineButton;
     public Button acceptButton;
 
@@ -24,14 +22,8 @@ public class SpellRewardUI : MonoBehaviour
     private SpellCaster player;
     public PlayerController playerObj;
 
-    public SpellRewardUI()
-    {
-        Instance = this;
-    }
-
     void Awake()
     {
-        Instance = this;
         // panel.SetActive(false);
     }
 
@@ -61,12 +53,12 @@ public class SpellRewardUI : MonoBehaviour
         for (int i = 0; i < 3; i++) {
             relics[i] = ar[rnd.Next(ar.Count)];
 
-            relicIcons[i].gameObject.SetActive(true);
-            relicDescs[i].gameObject.SetActive(true);
+            relicIcons[i].SetActive(true);
+            relicDescs[i].SetActive(true);
             takeRelicButtons[i].SetActive(true);
 
             // TODO: Set the image of relicIcons[i]
-            relicDescs[i].text = relics[i].trigger.description + ", " + relics[i].effect.description;
+            relicDescs[i].GetComponent<TextMeshProUGUI>().text = relics[i].trigger.description + ", " + relics[i].effect.description;
         }
 
         panel.SetActive(true);

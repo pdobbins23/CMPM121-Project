@@ -945,7 +945,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &220860974
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1852,13 +1852,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3df61adcc105f792aac9513300bbe264, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardPanel: {fileID: 0}
-  playerObj: {fileID: 0}
-  takeButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  rewardPanel: {fileID: 1709288111}
+  playerObj: {fileID: 1718273952}
 --- !u!114 &338553440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2790,8 +2785,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level_selector: {fileID: 1115058368}
+  class_selector: {fileID: 220860975}
   relicui: {fileID: 1202924358}
   button: {fileID: 6791571272867747119, guid: 47865e4d0d1669541a3aa2992225a687, type: 3}
+  playerClassButton: {fileID: 6791571272867747119, guid: 838be06b9b1f5c12191026e28ea64e6b, type: 3}
   gameOverButton: {fileID: 6791571272867747119, guid: d4fcb2fbb5d7a460faaa4f52051f9a45, type: 3}
   waveContinueButton: {fileID: 6791571272867747119, guid: b8a64e2722fde4e13aaf72e4baaabd85, type: 3}
   enemy: {fileID: 1832418719708313566, guid: bebfa21247182184d92ab200b93e6cf0, type: 3}
@@ -2806,6 +2803,10 @@ MonoBehaviour:
   currentLevel:
     name: 
     waves: -1
+  player: {fileID: 1718273952}
+  spellRewardUI: {fileID: 1709288111}
+  playerClassSelector: {fileID: 220860973}
+  difficultySelector: {fileID: 1115058366}
 --- !u!1 &532755679
 GameObject:
   m_ObjectHideFlags: 0
@@ -3778,13 +3779,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3df61adcc105f792aac9513300bbe264, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardPanel: {fileID: 0}
-  playerObj: {fileID: 0}
-  takeButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  rewardPanel: {fileID: 1709288111}
+  playerObj: {fileID: 1718273952}
 --- !u!114 &698261869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5687,7 +5683,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1115058367
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6240,13 +6236,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3df61adcc105f792aac9513300bbe264, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardPanel: {fileID: 0}
-  playerObj: {fileID: 0}
-  takeButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  rewardPanel: {fileID: 1709288111}
+  playerObj: {fileID: 1718273952}
 --- !u!114 &1353438090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7894,6 +7885,40 @@ MonoBehaviour:
   - {fileID: 578112679}
   declineButton: {fileID: 284566018}
   acceptButton: {fileID: 827468213}
+  relics:
+  - name: 
+    sprite: 0
+    trigger:
+      description: 
+      type: 
+      amount: 
+    effect:
+      description: 
+      type: 
+      amount: 
+      until: 
+  - name: 
+    sprite: 0
+    trigger:
+      description: 
+      type: 
+      amount: 
+    effect:
+      description: 
+      type: 
+      amount: 
+      until: 
+  - name: 
+    sprite: 0
+    trigger:
+      description: 
+      type: 
+      amount: 
+    effect:
+      description: 
+      type: 
+      amount: 
+      until: 
   playerObj: {fileID: 1718273952}
 --- !u!1 &1718273950
 GameObject:
@@ -7958,6 +7983,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4ef5265fce1b544c872205988919fb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerClass:
+    sprite: 0
+    health: 
+    mana: 
+    mana_regeneration: 
+    spellpower: 
+    speed: 
   healthui: {fileID: 765025204}
   manaui: {fileID: 71109453}
   spellui:

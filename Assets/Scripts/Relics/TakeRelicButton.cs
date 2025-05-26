@@ -4,7 +4,6 @@ public class TakeRelicButton : MonoBehaviour
 {
 	public GameObject rewardPanel;
 	public PlayerController playerObj;
-	public GameObject[] takeButtons = new GameObject[4];
 
 	public void TakeRelic(int index)
 	{

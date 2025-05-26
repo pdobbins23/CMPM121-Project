@@ -24,7 +24,8 @@ public class EnemySpawner : MonoBehaviour
     private GameObject continueBtn;
     private GameObject gameOverBtn;
 
-	public PlayerController player;
+    public PlayerController player;
+    public GameObject spellRewardUI;
 
 	public GameObject playerClassSelector;
 	public GameObject difficultySelector;
@@ -178,7 +179,7 @@ public class EnemySpawner : MonoBehaviour
         PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
         
         Spell newSpell = new SpellBuilder().GetRandomSpell(pc.spellcaster);
-        SpellRewardUI.Instance.Show(newSpell, pc.spellcaster);
+        spellRewardUI.GetComponent<SpellRewardUI>().Show(newSpell, pc.spellcaster);
     }
 
     IEnumerator SpawnEnemy(int wave, Enemy e, Level.Spawn s)
