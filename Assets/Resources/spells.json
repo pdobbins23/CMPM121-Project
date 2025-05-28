@@ -41,15 +41,31 @@
        "projectile": {"trajectory": "straight", "speed": "8", "sprite": 0, "lifetime": "0.1 power 100 / +"}
    },
    "knockback_blast": {
-        "name": "Knockback Blast",
-        "description": "Hits enemies with strong force.",
-        "icon": 4,
-        "damage": { "amount": "30 power 2 * +", "type": "arcane" },
-        "mana_cost": "25 power 1 +",
-        "cooldown": "2.0",
-        "projectile": {"trajectory": "straight", "speed": "14", "sprite": 2, "lifetime": "0.25"}
+       "name": "Knockback Blast",
+       "description": "Hits enemies with strong force.",
+       "icon": 4,
+       "damage": { "amount": "30 power 2 * +", "type": "arcane" },
+       "mana_cost": "25 power 1 +",
+       "cooldown": "2.0",
+       "projectile": {"trajectory": "straight", "speed": "14", "sprite": 2, "lifetime": "0.25"}
     },
-
+    "arcane_wave_bolt":  {
+        "name": "Arcane Wave Bolt",
+        "description": "A straight-Wave bolt.",
+        "icon": 0,
+        "damage": {"amount": "25 power 10 / +", "type": "arcane"},
+        "mana_cost": "14",
+        "cooldown": "2",
+        "projectile": {"trajectory": "wave", "speed": "2.3", "sprite": 0}
+   },
+   "waver": {
+       "name": "waver",
+       "description": "A straight-wave bolt.",
+       "damage_multiplier": "2",
+       "mana_adder": "7",
+       "projectile_trajectory": "wave"
+   },
+   
    "damage_amp": {
        "name": "damage-amplified",
        "description": "Increased damage and increased mana cost.",
