@@ -24,6 +24,7 @@ public class Unit : MonoBehaviour
         if (distance > 0.5f)
         {
             OnMove?.Invoke(distance);
+            EventBus.Instance.DoMove(distance);
             distance = 0;
         }
     }

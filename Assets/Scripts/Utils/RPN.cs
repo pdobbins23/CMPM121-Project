@@ -10,6 +10,16 @@ public class RPN {
 
     public static float eval(string exp, Dictionary<string, float> vars)
     {
+        try {
+            return evalRPN(exp, vars);
+        } catch {
+            Debug.LogError($"Bad RPN: {exp}");
+            throw;
+        }
+    }
+
+    static float evalRPN(string exp, Dictionary<string, float> vars)
+    {
         Stack<float> nums = new Stack<float>();
         string[] tokens = exp.Split(' ');
         foreach (var token in tokens)

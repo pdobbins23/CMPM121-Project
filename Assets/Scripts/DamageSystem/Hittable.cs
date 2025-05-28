@@ -20,6 +20,7 @@ public class Hittable
         {
             hp = 0;
             OnDeath();
+            EventBus.Instance.DoKill(this);
         }
     }
 

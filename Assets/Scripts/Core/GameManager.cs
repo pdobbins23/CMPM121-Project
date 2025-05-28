@@ -41,6 +41,13 @@ public class GameManager
     private List<GameObject> enemies;
     public int enemy_count { get { return enemies.Count; } }
 
+    public event Action OnWaveStart;
+    public void StartNextWave() {
+        OnWaveStart?.Invoke();
+    // wave logic here...
+}
+
+
     public void AddEnemy(GameObject enemy)
     {
         enemies.Add(enemy);
@@ -48,6 +55,14 @@ public class GameManager
     public void RemoveEnemy(GameObject enemy)
     {
         enemies.Remove(enemy);
+    }
+    public void KillAllEnemies()
+    {
+        foreach (var enemy in enemies.ToList())
+        {
+            var hp = enemy.GetComponent<EnemyController>().hp;
+            hp.Damage(new Damage(hp.hp, Damage.Type.DARK));
+        }
     }
 
     public GameObject GetClosestEnemy(Vector3 point)

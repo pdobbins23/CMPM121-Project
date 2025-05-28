@@ -5,6 +5,8 @@ public class RelicUIManager : MonoBehaviour
     public GameObject relicUIPrefab;
     public PlayerController player;
 
+    public GameObject[] relicSlots;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

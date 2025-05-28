@@ -16,8 +16,7 @@ public class SpellCaster
     {
         while (true)
         {
-            mana += mana_reg;
-            mana = Mathf.Min(mana, max_mana);
+            AddMana(mana_reg);
             
             yield return new WaitForSeconds(1);
         }
@@ -31,6 +30,11 @@ public class SpellCaster
         this.team = team;
     }
 
+    public void AddMana(int added_mana)
+    {
+        mana = Mathf.Min(mana + added_mana, max_mana);
+    }
+
     public IEnumerator Cast(int index, Vector3 where, Vector3 target)
     {
         var spell = spells[index];
@@ -40,6 +44,7 @@ public class SpellCaster
         if (mana >= manaCost && spell.IsReady())
         {
             mana -= manaCost;
+            EventBus.Instance.DoCast();
             yield return spell.Cast(where, target, team);
         }
         

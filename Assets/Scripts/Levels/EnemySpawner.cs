@@ -11,8 +11,10 @@ using UnityEngine.SceneManagement;
 public class EnemySpawner : MonoBehaviour
 {
     public Image level_selector;
+    public Image class_selector;
     public GameObject relicui;
     public GameObject button;
+    public GameObject playerClassButton;
     public GameObject gameOverButton;
     public GameObject waveContinueButton;
     public GameObject enemy;
@@ -21,6 +23,12 @@ public class EnemySpawner : MonoBehaviour
 
     private GameObject continueBtn;
     private GameObject gameOverBtn;
+
+    public PlayerController player;
+    public GameObject spellRewardUI;
+
+	public GameObject playerClassSelector;
+	public GameObject difficultySelector;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -36,6 +44,16 @@ public class EnemySpawner : MonoBehaviour
         continueBtn.gameObject.SetActive(false);
         
         int i = 0;
+        foreach (var playerClassName in PlayerClassManager.Instance.playerClasses.Keys)
+        {
+            var playerClass = PlayerClassManager.Instance.playerClasses[playerClassName];
+            GameObject selector = Instantiate(playerClassButton, class_selector.transform);
+            selector.transform.localPosition = new Vector3(0, 130 + -50 * i);
+            selector.GetComponent<PlayerClassSelectorController>().spawner = this;
+            selector.GetComponent<PlayerClassSelectorController>().SetClass(playerClassName, playerClass);
+            i++;
+        }
+        i = 0;
         foreach (var level in LevelManager.Instance.levelTypes.Values) {
             GameObject selector = Instantiate(button, level_selector.transform);
             selector.transform.localPosition = new Vector3(0, 130 + -50 * i);
@@ -87,11 +105,22 @@ public class EnemySpawner : MonoBehaviour
     {
         var pc = GameManager.Instance.player.GetComponent<PlayerController>();
 
-        pc.hp.hp = pc.hp.max_hp = 95 + GameManager.Instance.currentWave * 5;
-        pc.spellcaster.mana = 90 + GameManager.Instance.currentWave * 10;
-        pc.spellcaster.mana_reg = GameManager.Instance.currentWave + 10;
-        pc.spellcaster.spell_power = GameManager.Instance.currentWave * 10;
-        pc.speed = 5;
+        // pc.hp.hp = pc.hp.max_hp = 95 + GameManager.Instance.currentWave * 5;
+        // pc.spellcaster.mana = 90 + GameManager.Instance.currentWave * 10;
+        // pc.spellcaster.mana_reg = GameManager.Instance.currentWave + 10;
+        // pc.spellcaster.spell_power = GameManager.Instance.currentWave * 10;
+        // pc.speed = 5;
+
+        var ctx = new Dictionary<string, float>
+        {
+            { "wave", GameManager.Instance.currentWave },
+        };
+
+        pc.hp.hp = pc.hp.max_hp = RPN.EvalInt(pc.playerClass.health, ctx);
+        pc.spellcaster.mana = RPN.EvalInt(pc.playerClass.mana, ctx);
+        pc.spellcaster.mana_reg = RPN.EvalInt(pc.playerClass.mana_regeneration, ctx);
+        pc.spellcaster.spell_power = RPN.EvalInt(pc.playerClass.spellpower, ctx);
+        pc.speed = RPN.EvalInt(pc.playerClass.speed, ctx);
         
         StartCoroutine(SpawnWave());
     }
@@ -150,7 +179,7 @@ public class EnemySpawner : MonoBehaviour
         PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
         
         Spell newSpell = new SpellBuilder().GetRandomSpell(pc.spellcaster);
-        SpellRewardUI.Instance.Show(newSpell, pc.spellcaster);
+        spellRewardUI.GetComponent<SpellRewardUI>().Show(newSpell, pc.spellcaster);
     }
 
     IEnumerator SpawnEnemy(int wave, Enemy e, Level.Spawn s)

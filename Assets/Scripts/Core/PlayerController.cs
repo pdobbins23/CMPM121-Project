@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.IO;
@@ -7,6 +8,8 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
+    public PlayerClass playerClass;
+    
     public Hittable hp;
     public HealthBar healthui;
     public ManaBar manaui;
@@ -60,13 +63,30 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSpell(0);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSpell(1);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSpell(2);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSpell(3);
+        if (Input.GetKeyDown(KeyCode.K)) GameManager.Instance.KillAllEnemies();
+        RelicManager.Instance.Update();
+    }
+
+    public void SelectSpell(int index) {
+        if (index >= spellcaster.spells.Count) return;
+        currentSpell = index;
+        UpdateSpellUi();
     }
 
     public void DropSpell(int index)
     {
+        if (index >= spellcaster.spells.Count) return;
+        if (currentSpell > index || (currentSpell == index && index > 0)) currentSpell--;
         spellcaster.spells.RemoveAt(index);
+        UpdateSpellUi();
+    }
 
+    public void UpdateSpellUi()
+    {
         for (int i = 0; i < 4; i++)
             spellui[i].SetActive(false);
 
@@ -77,6 +97,7 @@ public class PlayerController : MonoBehaviour
         {
             spellui[i].SetActive(true);
             spellui[i].GetComponent<SpellUI>().SetSpell(spellcaster.spells[i]);
+            spellui[i].GetComponent<SpellUI>().SetHighlight(i == currentSpell ? Color.red : Color.black);
         }
     }
 
