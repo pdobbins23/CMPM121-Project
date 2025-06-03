@@ -2,18 +2,18 @@
 
 public class Item
 {
-    public readonly Spell _spell;
-    public readonly Relic _relic;
+    public readonly Spell? Spell;
+    public readonly Relic? Relic;
     // public readonly Equipment _equipment;
 
     public Item(Spell spell)
     {
-        _spell = spell;
+        Spell = spell;
     }
 
     public Item(Relic relic)
     {
-        _relic = relic;
+        Relic = relic;
     }
 
     // public Item(Equipment equipment)
@@ -25,7 +25,7 @@ public class Item
 public class ItemSlot
 {
     public Item? Item;
-    public bool highlighted = false;
+    public bool Highlighted = false;
 
     public ItemSlot() { }
 
