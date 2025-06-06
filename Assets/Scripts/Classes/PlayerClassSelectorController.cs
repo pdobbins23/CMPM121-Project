@@ -5,7 +5,6 @@ public class PlayerClassSelectorController : MonoBehaviour
 {
 	public TextMeshProUGUI label;
 	public PlayerClass playerClass;
-	public EnemySpawner spawner;
 
 	void Start()
 	{
@@ -24,9 +23,9 @@ public class PlayerClassSelectorController : MonoBehaviour
 
 	public void Click()
 	{
-		spawner.player.playerClass = playerClass;
+		// spawner.player.playerClass = playerClass;
 
-		spawner.playerClassSelector.SetActive(false);
-		spawner.difficultySelector.SetActive(true);
+		// spawner.playerClassSelector.SetActive(false);
+		// spawner.difficultySelector.SetActive(true);
 	}
 }

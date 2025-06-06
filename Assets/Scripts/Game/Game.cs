@@ -15,7 +15,7 @@ public class Game : MonoBehaviour
         return s_instance;
     }
 
-    public Interface ui = null!;
+    public Interface? ui = null!;
 
     void Awake()
     {
@@ -27,21 +27,42 @@ public class Game : MonoBehaviour
 
     void Start() { }
 
-    void Update() { }
+    void Update()
+    {
+        ui?.Update();
+    }
 }
 
 public class Interface
 {
+    public WaveManager wm;
+
+    public string? class_;
+    public string? level;
+
+    private readonly InterfaceBlock? _root;
+
     public Interface()
     {
-        var root = new InterfaceBlock(this);
-        root.Attach();
+        wm = GameObject.FindAnyObjectByType<WaveManager>();
+
+        _root = new InterfaceBlock(this);
+        _root.Attach();
+    }
+
+    public void Update()
+    {
+        _root?.Refresh();
     }
 }
 
 public class InterfaceBlock : MultiBlock
 {
     private readonly Interface _ui;
+    private SpellListBlock? _spellList;
+    private ClassMenuBlock? _classMenu;
+    private LevelMenuBlock? _levelMenu;
+    private RewardMenuBlock? _rewardMenu;
 
     public InterfaceBlock(Interface ui)
     {
@@ -51,11 +72,43 @@ public class InterfaceBlock : MultiBlock
 
     public void Refresh()
     {
-        Add(new SpellListBlock()).At(32, 32, 160, 30);
+        if (_spellList == null)
+        {
+            _spellList = new SpellListBlock();
+            Add(_spellList).At(32, 32, 160, 30);
+        }
 
-        Add(new ClassMenuBlock()).Center(0, 0, 1000, 600);
-        Add(new LevelMenuBlock()).Center(0, 0, 1000, 600);
-        Add(new RewardMenuBlock()).Center(0, 0, 1000, 800);
+        if (_classMenu == null && _ui.class_ == null)
+        {
+            _classMenu = new ClassMenuBlock(_ui);
+            Add(_classMenu).Center(0, 0, 1000, 600);
+        }
+        else if (_classMenu != null && _ui.class_ != null)
+        {
+            GameObject.Destroy(_classMenu.go);
+            _classMenu = null;
+
+            // spawner.player.playerClass = playerClass;
+        }
+
+        if (_levelMenu == null && _ui.level == null)
+        {
+            _levelMenu = new LevelMenuBlock(_ui);
+            Add(_levelMenu).Center(0, 0, 1000, 600);
+        }
+        else if (_levelMenu != null && _ui.level != null)
+        {
+            GameObject.Destroy(_levelMenu.go);
+            _levelMenu = null;
+
+            _ui.wm.StartLevel(_ui.level);
+        }
+
+        if (_rewardMenu == null)
+        {
+            // _rewardMenu = new RewardMenuBlock(_ui);
+            // Add(_rewardMenu).Center(0, 0, 1000, 800);
+        }
     }
 }
 
@@ -104,7 +157,7 @@ public class ClassMenuBlock : MultiBlock
 {
     private readonly List<string> _classes = new() { "Mage", "Warlock", "Battlemage" };
 
-    public ClassMenuBlock()
+    public ClassMenuBlock(Interface ui)
     {
         Add(new PanelBlock()).Center(0, 0, 1000, 600);
 
@@ -112,7 +165,10 @@ public class ClassMenuBlock : MultiBlock
 
         Add(new TextBlock("Class Selector", 0x333333)).Center(0, (offset + 1) * 60, 320, 32);
         for (int i = 0; i < _classes.Count; i++)
-            Add(new ButtonBlock(_classes[i])).Center(0, (offset - i) * 60, 160, 32);
+        {
+            string class_ = _classes[i];
+            Add(new ButtonBlock(class_, () => ui.class_ = class_)).Center(0, (offset - i) * 60, 160, 32);
+        }
     }
 }
 
@@ -120,7 +176,7 @@ public class LevelMenuBlock : MultiBlock
 {
     private readonly List<string> _levels = new() { "Easy", "Medium", "Endless" };
 
-    public LevelMenuBlock()
+    public LevelMenuBlock(Interface ui)
     {
         Add(new PanelBlock()).Center(0, 0, 1000, 600);
 
@@ -128,7 +184,10 @@ public class LevelMenuBlock : MultiBlock
 
         Add(new TextBlock("Level Selector", 0x333333)).Center(0, (offset + 1) * 60, 320, 32);
         for (int i = 0; i < _levels.Count; i++)
-            Add(new ButtonBlock(_levels[i])).Center(0, (offset - i) * 60, 160, 32);
+        {
+            string level = _levels[i];
+            Add(new ButtonBlock(level, () => ui.level = level)).Center(0, (offset - i) * 60, 160, 32);
+        }
     }
 }
 
@@ -136,7 +195,7 @@ public class RewardMenuBlock : MultiBlock
 {
     private readonly List<string> _classes = new() { "Mage", "Warlock", "Battlemage" };
 
-    public RewardMenuBlock()
+    public RewardMenuBlock(Interface ui)
     {
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
@@ -157,7 +216,7 @@ public class ButtonBlock : MultiBlock
     private readonly TextBlock _text;
     private int _clicksPending;
 
-    public ButtonBlock(string text)
+    public ButtonBlock(string text, Action? action = null)
     {
         var image = go.AddComponent<Image>();
         image.sprite = Sprites.Get("Sprites/UI/button", "button");
@@ -165,6 +224,7 @@ public class ButtonBlock : MultiBlock
 
         var button = go.AddComponent<Button>();
         button.onClick.AddListener(() => _clicksPending++);
+        if (action != null) button.onClick.AddListener(() => action.Invoke());
 
         _text = new TextBlock(text, 0xffffff);
         Add(_text).Center(0, 0);
