@@ -60,6 +60,7 @@ public class InterfaceBlock : MultiBlock
 {
     private readonly Interface _ui;
     private InventoryBlock? _inventory;
+    private WaveStatusBlock? _waveStatus;
     private ClassMenuBlock? _classMenu;
     private LevelMenuBlock? _levelMenu;
     private RewardMenuBlock? _rewardMenu;
@@ -78,6 +79,13 @@ public class InterfaceBlock : MultiBlock
             Add(_inventory).At(32, 32, 160, 30);
         }
         _inventory.Refresh();
+
+        if (_waveStatus == null)
+        {
+            _waveStatus = new WaveStatusBlock();
+            Add(_waveStatus).Center(0, 465, 800, 36);
+        }
+        _waveStatus.Refresh();
 
         if (_classMenu == null && _ui.class_ == null)
         {
@@ -195,6 +203,36 @@ public class ItemBlock : MultiBlock
         else if (slot.Item.Relic != null)
         {
             // TODO
+        }
+    }
+}
+
+public class WaveStatusBlock : MultiBlock
+{
+    private readonly TextBlock _text;
+
+    public WaveStatusBlock()
+    {
+        _text = new TextBlock("", 0xffffff);
+        Add(_text).Center(0, 0, 800, 36);
+    }
+
+    public void Refresh()
+    {
+        switch (GameManager.Instance.state)
+        {
+            case GameManager.GameState.INWAVE:
+                _text.Set($"Enemies Left: {GameManager.Instance.enemy_count}");
+                break;
+            case GameManager.GameState.COUNTDOWN:
+                _text.Set($"Starting in {GameManager.Instance.countdown}...");
+                break;
+            case GameManager.GameState.ENDINGWAVE:
+                _text.Set($"Total Enemies Killed: {GameManager.Instance.totalEnemiesForWave}");
+                break;
+            case GameManager.GameState.GAMEOVER:
+                _text.Set("GAME OVER");
+                break;
         }
     }
 }
