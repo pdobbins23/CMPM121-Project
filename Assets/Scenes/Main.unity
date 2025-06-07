@@ -945,7 +945,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &220860974
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2645,7 +2645,6 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
-  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2771,41 +2770,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1718273953}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &519420033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efde5d11a0c0a9e43921697e98a09200, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  level_selector: {fileID: 1115058368}
-  class_selector: {fileID: 220860975}
-  relicui: {fileID: 1202924358}
-  button: {fileID: 6791571272867747119, guid: 47865e4d0d1669541a3aa2992225a687, type: 3}
-  playerClassButton: {fileID: 6791571272867747119, guid: 838be06b9b1f5c12191026e28ea64e6b, type: 3}
-  gameOverButton: {fileID: 6791571272867747119, guid: d4fcb2fbb5d7a460faaa4f52051f9a45, type: 3}
-  waveContinueButton: {fileID: 6791571272867747119, guid: b8a64e2722fde4e13aaf72e4baaabd85, type: 3}
-  enemy: {fileID: 1832418719708313566, guid: bebfa21247182184d92ab200b93e6cf0, type: 3}
-  SpawnPoints:
-  - {fileID: 956873992}
-  - {fileID: 1677496371}
-  - {fileID: 1428830197}
-  - {fileID: 372856468}
-  - {fileID: 2073311049}
-  - {fileID: 1577913788}
-  - {fileID: 587991943}
-  currentLevel:
-    name: 
-    waves: -1
-  player: {fileID: 1718273952}
-  spellRewardUI: {fileID: 1709288111}
-  playerClassSelector: {fileID: 220860973}
-  difficultySelector: {fileID: 1115058366}
 --- !u!1 &532755679
 GameObject:
   m_ObjectHideFlags: 0
@@ -58472,7 +58436,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1982188284
 RectTransform:
   m_ObjectHideFlags: 0
@@ -58808,6 +58772,55 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &2060690983
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2060690985}
+  - component: {fileID: 2060690984}
+  m_Layer: 0
+  m_Name: WaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2060690984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060690983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e28837ccdc693498a844889c2a29923, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentLevel:
+    name: 
+    waves: -1
+  player: {fileID: 1718273952}
+  enemy: {fileID: 1832418719708313566, guid: bebfa21247182184d92ab200b93e6cf0, type: 3}
+--- !u!4 &2060690985
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060690983}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 748.5437, y: 578.754, z: -15.626742}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2070572076
 GameObject:
   m_ObjectHideFlags: 0
@@ -59007,7 +59020,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2085212184
 RectTransform:
   m_ObjectHideFlags: 0
@@ -59376,4 +59389,5 @@ SceneRoots:
   - {fileID: 220180078}
   - {fileID: 947241246}
   - {fileID: 856041117}
+  - {fileID: 2060690985}
   - {fileID: 597629248}

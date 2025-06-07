@@ -89,7 +89,8 @@ public class InterfaceBlock : MultiBlock
             GameObject.Destroy(_classMenu.go);
             _classMenu = null;
 
-            // spawner.player.playerClass = playerClass;
+            PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
+            pc.playerClass = PlayerClassManager.Instance.playerClasses[_ui.class_];
         }
 
         if (_levelMenu == null && _ui.level == null)
@@ -105,10 +106,15 @@ public class InterfaceBlock : MultiBlock
             _ui.wm.StartLevel(_ui.level);
         }
 
-        if (_rewardMenu == null)
+        if (_rewardMenu == null && GameManager.Instance.state == GameManager.GameState.ENDINGWAVE)
         {
-            // _rewardMenu = new RewardMenuBlock(_ui);
-            // Add(_rewardMenu).Center(0, 0, 1000, 800);
+            _rewardMenu = new RewardMenuBlock(_ui);
+            Add(_rewardMenu).Center(0, 0, 1000, 800);
+        }
+        else if (_rewardMenu != null && GameManager.Instance.state != GameManager.GameState.ENDINGWAVE)
+        {
+            GameObject.Destroy(_rewardMenu.go);
+            _rewardMenu = null;
         }
     }
 }
@@ -247,7 +253,9 @@ public class RewardMenuBlock : MultiBlock
 
         for (int i = 0; i < 3; i++)
             Add(new ButtonBlock("Take")).Center(200 * (i - 1), -190, 160, 32);
-        Add(new ButtonBlock("Skip")).Center(0, -270, 160, 32);
+        Add(new ButtonBlock("Continue", () =>
+            GameManager.Instance.state = GameManager.GameState.WAVEEND
+        )).Center(0, -270, 160, 32);
     }
 }
 

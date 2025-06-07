@@ -1,8 +1,8 @@
 [
-   {   
-       "name": "Easy",
-       "waves": 10,
-       "spawns": [
+    {
+        "name": "Easy",
+        "waves": 10,
+        "spawns": [
             {
                 "enemy": "zombie",
                 "count": "5 wave +",
@@ -11,7 +11,7 @@
                 "sequence": [1, 2, 3],
                 "location": "random"
             },
-            {   
+            {
                 "enemy": "skeleton",
                 "count": "wave 3 /",
                 "hp": "30 wave *",
@@ -29,22 +29,22 @@
                 "count": "wave 4 / 1 wave 4 % - *",
                 "hp": "100 10 wave * +",
                 "location": "random"
-            }              
+            }
         ]
-   },
-   {   
-       "name": "Medium",
-       "waves": 15,
-       "spawns": [
+    },
+    {
+        "name": "Medium",
+        "waves": 15,
+        "spawns": [
             {
                 "enemy": "zombie",
                 "count": "5 wave 2 * +",
                 "hp": "25 wave *",
                 "delay": "5",
-                "sequence": [1,2,3],
+                "sequence": [1, 2, 3],
                 "location": "random"
             },
-            {   
+            {
                 "enemy": "skeleton",
                 "count": "wave 2 /",
                 "hp": "25 wave *",
@@ -64,21 +64,21 @@
                 "hp": "80 10 wave * +",
                 "damage": "base 10 +",
                 "location": "random"
-            }         
+            }
         ]
-   },
-   {   
-       "name": "Endless",
-       "spawns": [
+    },
+    {
+        "name": "Endless",
+        "spawns": [
             {
                 "enemy": "zombie",
                 "count": "5 wave 3 * +",
                 "hp": "15 wave *",
                 "delay": "5",
-                "sequence": [1,2,3],
+                "sequence": [1, 2, 3],
                 "location": "random"
             },
-            {   
+            {
                 "enemy": "skeleton",
                 "count": "wave 4 /",
                 "hp": "20 wave *",
@@ -98,7 +98,7 @@
                 "hp": "80 8 wave * +",
                 "damage": "base 5 -",
                 "location": "random"
-            }         
+            }
         ]
-   }
+    }
 ]

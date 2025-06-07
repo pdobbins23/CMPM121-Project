@@ -99,68 +99,65 @@
         "name": "Mysterious Mask",
         "sprite": 4,
         "trigger": {
-          "description": "When you kill an enemy",
-          "type": "on-kill"
+            "description": "When you kill an enemy",
+            "type": "on-kill"
         },
         "effect": {
-          "description": "your speed gain 5 in 3 second",
-          "type": "gain-speed",
-          "amount": "5"
+            "description": "your speed gain 5 in 3 second",
+            "type": "gain-speed",
+            "amount": "5"
         }
-  },
-  {
-    "name": "Knight Shield",
-    "sprite": 5,
-
-    "trigger": {
-      "description": "When your healthly lower than 15%",
-      "type": "on-hurt"
     },
-    "effect": {
-      "description": "Your healthly will gradully increase to 15%, each second increase 0.16%",
-      "type": "gain-healthly",
-      "amount": "0.16"
-    }
-  },
-
-  {
-    "name": "Golden Crown",
-    "sprite": 9,
-    "trigger": {
-      "description": "When you kill an enemy",
-      "type": "on-kill"
+    {
+        "name": "Knight Shield",
+        "sprite": 5,
+        "trigger": {
+            "description": "When your healthly lower than 15%",
+            "type": "on-hurt"
+        },
+        "effect": {
+            "description": "Your healthly will gradully increase to 15%, each second increase 0.16%",
+            "type": "gain-healthly",
+            "amount": "0.16"
+        }
     },
-    "effect": {
-      "description": "your spell power s gain 25 in 3 second",
-      "type": "gain-spell-power",
-      "amount": "25"
-    }
-  },
-  {
-    "name": "Grand Chronicle",
-    "sprite": 10,
-    "trigger": {
-      "description": "When your healthly lower than 25%",
-      "type": "on-hurt"
+    {
+        "name": "Golden Crown",
+        "sprite": 9,
+        "trigger": {
+            "description": "When you kill an enemy",
+            "type": "on-kill"
+        },
+        "effect": {
+            "description": "your spell power s gain 25 in 3 second",
+            "type": "gain-spell-power",
+            "amount": "25"
+        }
     },
-    "effect": {
-      "description": "your spell power gains 20 additional",
-      "type": "gain-spellpower",
-      "amount": "20"
-    }
-  },
-  {
-    "name": "Red necklace",
-    "sprite": 6,
-
-    "trigger": {
-      "description": "When your take this relic increase healthly permanently",
-      "type": "one-time"
+    {
+        "name": "Grand Chronicle",
+        "sprite": 10,
+        "trigger": {
+            "description": "When your healthly lower than 25%",
+            "type": "on-hurt"
+        },
+        "effect": {
+            "description": "your spell power gains 20 additional",
+            "type": "gain-spellpower",
+            "amount": "20"
+        }
     },
-    "effect": {
-      "description": "Your max healthly will increase",
-      "type": "gain-healthly",
-      "amount": "10 wave 5 * +"
+    {
+        "name": "Red necklace",
+        "sprite": 6,
+        "trigger": {
+            "description": "When your take this relic increase healthly permanently",
+            "type": "one-time"
+        },
+        "effect": {
+            "description": "Your max healthly will increase",
+            "type": "gain-healthly",
+            "amount": "10 wave 5 * +"
+        }
     }
-  }
 ]
