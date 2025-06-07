@@ -136,22 +136,58 @@ public class SpellBlock : MultiBlock
     }
 }
 
-/*
 public class ItemBlock : MultiBlock
 {
+    private readonly List<string> _spell_sprites = new() {
+        "ProjectUtumno_full_1910",
+        "ProjectUtumno_full_1908",
+        "ProjectUtumno_full_1915",
+        "ProjectUtumno_full_1911",
+        "ProjectUtumno_full_1906",
+        "ProjectUtumno_full_2002",
+        "ProjectUtumno_full_1951",
+        "ProjectUtumno_full_1998",
+        "ProjectUtumno_full_2005",
+        "ProjectUtumno_full_2027",
+        "ProjectUtumno_full_2031",
+        "ProjectUtumno_full_2037",
+        "ProjectUtumno_full_2039",
+        "ProjectUtumno_full_2041",
+        "ProjectUtumno_full_2130",
+        "ProjectUtumno_full_2132",
+        "ProjectUtumno_full_2135",
+        "ProjectUtumno_full_2198",
+    };
+
     public ItemBlock(ItemSlot slot)
     {
         Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 0, 64, 64);
-        Add(new RectBlock(0xff0000)).Center(0, 0, 52, 52);
-        Add(new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", "ProjectUtumno_full_1910"))).Center(0, 0, 48, 48);
-        Add(new RectBlock(0x888888, 0.5f)).Center(0, 0, 48, 48);
-        Add(new RectBlock(0xffffff)).Center(12, -16, 24, 16);
-        Add(new RectBlock(0xffffff)).Center(-12, 16, 24, 16);
-        Add(new TextBlock(Util.FormatShort(10), 0x0000ff)).Center(12, -16, 24, 12);
-        Add(new TextBlock(Util.FormatShort(20), 0xff0000)).Center(-12, 16, 24, 12);
+        Add(new RectBlock(slot.Highlighted ? 0xff0000 : 0xf00000)).Center(0, 0, 52, 52);
+
+        if (slot.Item == null)
+        {
+            Add(new RectBlock(0xfff1d2)).Center(0, 0, 48, 48);
+        }
+        else if (slot.Item.Spell != null)
+        {
+            Spell spell = slot.Item.Spell;
+            Sprite sprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()]);
+            float sinceLast = Time.time - spell.LastCast();
+            float ratioLeft = sinceLast > spell.GetCoolDown() ? 0 : 1 - sinceLast / spell.GetCoolDown();
+
+            Add(new ImageBlock(sprite)).Center(0, 0, 48, 48);
+            Add(new RectBlock(0x888888, 0.5f)).Center(-24 + 24 * ratioLeft, 0, 48 * ratioLeft, 48);
+            Add(new RectBlock(0xffffff)).Center(12, -16, 24, 16);
+            Add(new RectBlock(0xffffff)).Center(-12, 16, 24, 16);
+            Add(new TextBlock(Util.FormatShort(spell.GetManaCost()), 0x0000ff)).Center(12, -16, 24, 12);
+            Add(new TextBlock(Util.FormatShort((int) spell.GetBaseDamage()), 0xff0000)).Center(-12, 16, 24, 12);
+        }
+        else if (slot.Item.Relic != null)
+        {
+            // TODO
+        }
     }
 }
-*/
 
 public class ClassMenuBlock : MultiBlock
 {
