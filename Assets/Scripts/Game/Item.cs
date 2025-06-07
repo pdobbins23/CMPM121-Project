@@ -29,7 +29,7 @@ public class ItemSlot
 
     public ItemSlot() { }
 
-    public ItemSlot(Item item)
+    public ItemSlot(Item? item)
     {
         Item = item;
     }

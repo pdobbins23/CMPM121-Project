@@ -59,7 +59,7 @@ public class Interface
 public class InterfaceBlock : MultiBlock
 {
     private readonly Interface _ui;
-    private SpellListBlock? _spellList;
+    private InventoryBlock? _inventory;
     private ClassMenuBlock? _classMenu;
     private LevelMenuBlock? _levelMenu;
     private RewardMenuBlock? _rewardMenu;
@@ -72,11 +72,12 @@ public class InterfaceBlock : MultiBlock
 
     public void Refresh()
     {
-        if (_spellList == null)
+        if (_inventory == null)
         {
-            _spellList = new SpellListBlock();
-            Add(_spellList).At(32, 32, 160, 30);
+            _inventory = new InventoryBlock();
+            Add(_inventory).At(32, 32, 160, 30);
         }
+        _inventory.Refresh();
 
         if (_classMenu == null && _ui.class_ == null)
         {
@@ -112,27 +113,30 @@ public class InterfaceBlock : MultiBlock
     }
 }
 
-public class SpellListBlock : MultiBlock
+public class InventoryBlock : MultiBlock
 {
-    public SpellListBlock()
-    {
-        for (int i = 0; i < 4; i++)
-            Add(new SpellBlock()).At(i * (64 + 8), 0, 64, 64);
-    }
-}
+    List<ItemBlock> _items = new();
+    public InventoryBlock() { } // List<ItemSlot> inventory
 
-public class SpellBlock : MultiBlock
-{
-    public SpellBlock()
+    public void Refresh()
     {
-        Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 0, 64, 64);
-        Add(new RectBlock(0xff0000)).Center(0, 0, 52, 52);
-        Add(new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", "ProjectUtumno_full_1910"))).Center(0, 0, 48, 48);
-        Add(new RectBlock(0x888888, 0.5f)).Center(0, 0, 48, 48);
-        Add(new RectBlock(0xffffff)).Center(12, -16, 24, 16);
-        Add(new RectBlock(0xffffff)).Center(-12, 16, 24, 16);
-        Add(new TextBlock(Util.FormatShort(10), 0x0000ff)).Center(12, -16, 24, 12);
-        Add(new TextBlock(Util.FormatShort(20), 0xff0000)).Center(-12, 16, 24, 12);
+
+        foreach (var item in _items)
+            GameObject.Destroy(item.go);
+        _items = new();
+
+        if (GameManager.Instance.player == null) return;
+        PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
+        if (pc.spellcaster == null) return;
+
+        for (int i = 0; i < 4; i++)
+        {
+            var slot = new ItemSlot(i < pc.spellcaster.spells.Count ? new Item(pc.spellcaster.spells[i]) : null);
+            slot.Highlighted = pc.currentSpell == i;
+            var block = new ItemBlock(slot);
+            _items.Add(block);
+            Add(block).At(i * (64 + 8), 0, 64, 64);
+        }
     }
 }
 
@@ -162,11 +166,11 @@ public class ItemBlock : MultiBlock
     public ItemBlock(ItemSlot slot)
     {
         Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 0, 64, 64);
-        Add(new RectBlock(slot.Highlighted ? 0xff0000 : 0xf00000)).Center(0, 0, 52, 52);
+        Add(new RectBlock(slot.Highlighted ? 0xff0000 : 0x000000)).Center(0, 0, 52, 52);
 
         if (slot.Item == null)
         {
-            Add(new RectBlock(0xfff1d2)).Center(0, 0, 48, 48);
+            Add(new RectBlock(0xfff1d2)).Center(0, 0, 46, 46);
         }
         else if (slot.Item.Spell != null)
         {
