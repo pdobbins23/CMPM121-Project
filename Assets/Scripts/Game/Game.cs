@@ -277,20 +277,21 @@ public class LevelMenuBlock : MultiBlock
 
 public class RewardMenuBlock : MultiBlock
 {
-    private readonly List<string> _classes = new() { "Mage", "Warlock", "Battlemage" };
-
     public RewardMenuBlock(Interface ui)
     {
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
-        float offset = (_classes.Count - 1) / 2f;
+        Add(new TextBlock("Pick your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
-        Add(new TextBlock("Pick your rewards:", 0x333333)).Center(0, 300, 320, 32);
+        Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 175, 200, 200);
 
-        Add(new ButtonBlock("Accept")).Center(0, 40, 160, 32);
+        Add(new ButtonBlock("Accept", () => {})).Center(0, 20, 160, 32);
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++) {
+            Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(200 * (i - 1), -100, 100, 100);
             Add(new ButtonBlock("Take")).Center(200 * (i - 1), -190, 160, 32);
+        }
+
         Add(new ButtonBlock("Continue", () =>
             GameManager.Instance.state = GameManager.GameState.WAVEEND
         )).Center(0, -270, 160, 32);

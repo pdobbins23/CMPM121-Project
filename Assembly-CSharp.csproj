@@ -81,7 +81,9 @@
     <Compile Include="Assets/Scripts/Relics/TakeRelicButton.cs" />
     <Compile Include="Assets/Scripts/Spells/SpellBuilder.cs" />
     <Compile Include="Assets/Scripts/UI/RelicUIManager.cs" />
+    <Compile Include="Assets/Scripts/Game/Item.cs" />
     <Compile Include="Assets/Scripts/SpriteManagement/IconManager.cs" />
+    <Compile Include="Assets/Scripts/Levels/WaveManager.cs" />
     <Compile Include="Assets/Scripts/Spells/SpellCaster.cs" />
     <Compile Include="Assets/Scripts/SpriteManagement/RelicIconManager.cs" />
     <Compile Include="Assets/Scripts/Movement/EnemyController.cs" />
@@ -112,17 +114,18 @@
     <Compile Include="Assets/Scripts/Core/PlayerController.cs" />
     <Compile Include="Assets/Scripts/Classes/PlayerClass.cs" />
     <Compile Include="Assets/Scripts/Levels/LevelManager.cs" />
-    <Compile Include="Assets/Scripts/Levels/EnemySpawner.cs" />
     <Compile Include="Assets/Scripts/Spells/RawSpell.cs" />
     <Compile Include="Assets/Scripts/UI/WaveLabelController.cs" />
     <Compile Include="Assets/Scripts/Core/GameManager.cs" />
     <Compile Include="Assets/Scripts/Projectiles/SpiralingProjectileMovement.cs" />
+    <Compile Include="Assets/Scripts/Game/Block.cs" />
     <Compile Include="Assets/Scripts/Relics/RelicManager.cs" />
     <Compile Include="Assets/Scripts/UI/AnimateDamage.cs" />
     <Compile Include="Assets/Scripts/UI/SpellUIContainer.cs" />
     <Compile Include="Assets/Scripts/Movement/Unit.cs" />
     <Compile Include="Assets/Scripts/Spells/SelectSpellButton.cs" />
     <Compile Include="Assets/Scripts/Spells/ProjectileManager.cs" />
+    <Compile Include="Assets/Scripts/Game/Game.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />
@@ -1332,6 +1335,10 @@
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
       <HintPath>Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Toolchain.Linux-x86_64">
+      <HintPath>Library/ScriptAssemblies/Unity.Toolchain.Linux-x86_64.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.State">
