@@ -159,7 +159,6 @@ public class InventoryBlock : MultiBlock
 
     public void Refresh()
     {
-
         foreach (var item in _items)
             GameObject.Destroy(item.go);
         _items = new();
@@ -305,6 +304,8 @@ public class RewardMenuBlock : MultiBlock
     private readonly Spell rewardSpell;
     private readonly List<RelicData> rewardRelics;
 
+    private readonly Block craftingMenu;
+
     private readonly List<string> _spell_sprites = new() {
         "ProjectUtumno_full_1910",
         "ProjectUtumno_full_1908",
@@ -351,6 +352,10 @@ public class RewardMenuBlock : MultiBlock
         
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
+        Add(new ButtonBlock("Craft", (obj) => {
+            craftingMenu.go.SetActive(true);
+        })).Center(-350, 300, 160, 64);
+
         Add(new TextBlock("Pick your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
         Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 175, 200, 200);
@@ -367,8 +372,6 @@ public class RewardMenuBlock : MultiBlock
             {
                 pc.spellcaster.spells.Add(rewardSpell);
                 obj.go.SetActive(false);
-
-                // TODO: Update player spell UI?
             }
         })).Center(0, 10, 160, 32);
 
@@ -397,6 +400,21 @@ public class RewardMenuBlock : MultiBlock
         Add(new ButtonBlock("Continue", (obj) =>
             GameManager.Instance.state = GameManager.GameState.WAVEEND
         )).Center(0, -300, 160, 32);
+
+        craftingMenu = Add(new CraftingMenuBlock(ui)).Center(0, 0, 1000, 800);
+        craftingMenu.go.SetActive(false);
+    }
+}
+
+public class CraftingMenuBlock : MultiBlock
+{
+    public CraftingMenuBlock(Interface ui)
+    {
+        Add(new PanelBlock()).Center(0, 0, 1000, 800);
+
+        Add(new ButtonBlock("Close", (obj) => {
+            go.SetActive(false);
+        })).Center(0, 0, 160, 32);
     }
 }
 
