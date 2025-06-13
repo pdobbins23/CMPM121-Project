@@ -304,7 +304,7 @@ public class RewardMenuBlock : MultiBlock
     private readonly Spell rewardSpell;
     private readonly List<RelicData> rewardRelics;
 
-    private readonly Block craftingMenu;
+    private readonly CraftingMenuBlock craftingMenu;
 
     private readonly List<string> _spell_sprites = new() {
         "ProjectUtumno_full_1910",
@@ -353,6 +353,7 @@ public class RewardMenuBlock : MultiBlock
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
         Add(new ButtonBlock("Craft", (obj) => {
+            craftingMenu.Refresh();
             craftingMenu.go.SetActive(true);
         })).Center(-350, 300, 160, 64);
 
@@ -401,7 +402,7 @@ public class RewardMenuBlock : MultiBlock
             GameManager.Instance.state = GameManager.GameState.WAVEEND
         )).Center(0, -300, 160, 32);
 
-        craftingMenu = Add(new CraftingMenuBlock(ui)).Center(0, 0, 1000, 800);
+        craftingMenu = (CraftingMenuBlock)Add(new CraftingMenuBlock(ui)).Center(0, 0, 1000, 800);
         craftingMenu.go.SetActive(false);
     }
 }
@@ -422,8 +423,8 @@ public class CraftingMenuBlock : MultiBlock
 
     private List<SpellItem> _items = new();
 
-    private SpellItem _item_a;
-    private SpellItem _item_b;
+    private SpellItem _item_a = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
+    private SpellItem _item_b = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
 
     private readonly List<string> _spell_sprites = new() {
         "ProjectUtumno_full_1910",
@@ -446,12 +447,29 @@ public class CraftingMenuBlock : MultiBlock
         "ProjectUtumno_full_2198",
     };
     
-    public CraftingMenuBlock(Interface ui)
+    public CraftingMenuBlock(Interface ui) {
+        Add(new PanelBlock()).Center(0, 0, 1000, 800);
+
+        Add(_item_a.icon).Center(-200, 0, 200, 200);
+        Add(_item_b.icon).Center(200, 0, 200, 200);
+
+        Add(new ButtonBlock("Craft", (obj) => {
+            
+        })).Center(0, -150, 200, 50);
+
+        Add(new ButtonBlock("Close", (obj) => {
+            go.SetActive(false);
+        })).Center(0, -300, 160, 32);
+    }
+
+    public void Refresh()
     {
+        foreach (var spellItem in _items)
+            GameObject.Destroy(spellItem.icon.go);
+        _items = new();
+        
         var pc = GameManager.Instance.player.GetComponent<PlayerController>();
         var spells = pc.spellcaster.spells;
-
-        Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
         for (int i = 0; i < spells.Count(); i++)
         {
@@ -465,19 +483,24 @@ public class CraftingMenuBlock : MultiBlock
             })).Center(150 * (i - 1), 225, 100, 32);
         }
 
-        _item_a = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
-        _item_b = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
+        if (_item_a.spell != null)
+        {
+            GameObject.Destroy(_item_a.icon.go);
 
-        Add(_item_a.icon).Center(-200, 0, 200, 200);
-        Add(_item_b.icon).Center(200, 0, 200, 200);
+            _item_a.spell = null;
+            _item_a.icon = new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"));
 
-        Add(new ButtonBlock("Craft", (obj) => {
-            
-        })).Center(0, -150, 200, 50);
+            Add(_item_a.icon).Center(-200, 0, 200, 200);
+        }
+        if (_item_b.spell != null)
+        {
+            GameObject.Destroy(_item_b.icon.go);
 
-        Add(new ButtonBlock("Close", (obj) => {
-            go.SetActive(false);
-        })).Center(0, -300, 160, 32);
+            _item_b.spell = null;
+            _item_b.icon = new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"));
+
+            Add(_item_b.icon).Center(200, 0, 200, 200);
+        }
     }
 }
 
