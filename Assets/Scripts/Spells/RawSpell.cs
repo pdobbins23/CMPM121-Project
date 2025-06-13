@@ -88,32 +88,34 @@ public struct RawSpell
     {
         var rs = new RawSpell();
 
+        // TODO: Fix this whole thing somehow, combine spells better.
+
         // Base spell elements
         rs.Name = $"{Name} ({modifierSpell.Name})";
-        rs.Description = Description;
-        rs.ManaCost = ManaCost;
-        rs.BaseDamage = BaseDamage;
-        rs.SecondaryDamage = SecondaryDamage;
-        rs.CoolDown = CoolDown;
-        rs.Icon = Icon;
-        rs.Count = Count;
-        rs.BaseProjectile = BaseProjectile;
-        rs.SecondaryProjectile = SecondaryProjectile;
+        // rs.Description = Description;
+        // rs.ManaCost = ManaCost;
+        // rs.BaseDamage = BaseDamage;
+        // rs.SecondaryDamage = SecondaryDamage;
+        // rs.CoolDown = CoolDown;
+        // rs.Icon = Icon;
+        // rs.Count = Count;
+        // rs.BaseProjectile = BaseProjectile;
+        // rs.SecondaryProjectile = SecondaryProjectile;
 
         // Modifier stuff
-        rs.DoubleProjectile = modifierSpell.DoubleProjectile;
-        rs.SplitProjectile = modifierSpell.SplitProjectile;
-        rs.ProjectileTrajectory = modifierSpell.ProjectileTrajectory;
-        rs.DamageAdder = modifierSpell.DamageAdder;
-        rs.SpeedAdder = modifierSpell.SpeedAdder;
-        rs.ManaAdder = modifierSpell.ManaAdder;
-        rs.CoolDownAdder = modifierSpell.CoolDownAdder;
-        rs.DamageMultiplier = modifierSpell.DamageMultiplier;
-        rs.SpeedMultiplier = modifierSpell.SpeedMultiplier;
-        rs.ManaMultiplier = modifierSpell.ManaMultiplier;
-        rs.CoolDownMultiplier = modifierSpell.CoolDownMultiplier;
-        rs.Delay = modifierSpell.Delay;
-        rs.Angle = modifierSpell.Angle;
+        // rs.DoubleProjectile = modifierSpell.DoubleProjectile;
+        // rs.SplitProjectile = modifierSpell.SplitProjectile;
+        // rs.ProjectileTrajectory = modifierSpell.ProjectileTrajectory;
+        // rs.DamageAdder = modifierSpell.DamageAdder;
+        // rs.SpeedAdder = modifierSpell.SpeedAdder;
+        // rs.ManaAdder = modifierSpell.ManaAdder;
+        // rs.CoolDownAdder = modifierSpell.CoolDownAdder;
+        // rs.DamageMultiplier = modifierSpell.DamageMultiplier;
+        // rs.SpeedMultiplier = modifierSpell.SpeedMultiplier;
+        // rs.ManaMultiplier = modifierSpell.ManaMultiplier;
+        // rs.CoolDownMultiplier = modifierSpell.CoolDownMultiplier;
+        // rs.Delay = modifierSpell.Delay;
+        // rs.Angle = modifierSpell.Angle;
 
         return rs;
     }

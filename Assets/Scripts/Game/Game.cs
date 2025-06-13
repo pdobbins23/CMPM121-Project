@@ -339,6 +339,7 @@ public class RewardMenuBlock : MultiBlock
         Add(new TextBlock("Pick your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
         Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 175, 200, 200);
+        Add(new TextBlock(rewardSpell.GetName(), 0x333333)).Center(0, 50, 750, 32);
 
         Sprite rewardSpellSprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[rewardSpell.GetIcon()]);
         
@@ -351,8 +352,10 @@ public class RewardMenuBlock : MultiBlock
             {
                 pc.spellcaster.spells.Add(rewardSpell);
                 obj.go.SetActive(false);
+
+                // TODO: Update player spell UI?
             }
-        })).Center(0, 20, 160, 32);
+        })).Center(0, 10, 160, 32);
 
         for (int i = 0; i < rewardRelics.Count(); i++) {
             Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(200 * (i - 1), -100, 100, 100);
