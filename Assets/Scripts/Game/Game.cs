@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class Game : MonoBehaviour
 {
@@ -116,7 +117,31 @@ public class InterfaceBlock : MultiBlock
 
         if (_rewardMenu == null && GameManager.Instance.state == GameManager.GameState.ENDINGWAVE)
         {
-            _rewardMenu = new RewardMenuBlock(_ui);
+            PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
+            
+            var rewardSpell = new SpellBuilder().GetRandomSpell(pc.spellcaster);
+            var rewardRelics = new List<RelicData>();
+
+            var rnd = new System.Random();
+            var ar = RelicManager.Instance.AllRelics;
+            var r = RelicManager.Instance.ActiveRelics;
+
+            var availableRelics = ar
+                .Where(data => !r.Any(active => active.Name == data.name))
+                .ToList();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var eligible = availableRelics
+                    .Where(data => !rewardRelics.Any(chosen => chosen.name == data.name))
+                    .ToList();
+
+                if (eligible.Count() == 0) break;
+                
+                rewardRelics.Add(eligible[rnd.Next(eligible.Count())]);
+            }
+
+            _rewardMenu = new RewardMenuBlock(_ui, rewardSpell, rewardRelics);
             Add(_rewardMenu).Center(0, 0, 1000, 800);
         }
         else if (_rewardMenu != null && GameManager.Instance.state != GameManager.GameState.ENDINGWAVE)
@@ -251,7 +276,7 @@ public class ClassMenuBlock : MultiBlock
         for (int i = 0; i < _classes.Count; i++)
         {
             string class_ = _classes[i];
-            Add(new ButtonBlock(class_, () => ui.class_ = class_)).Center(0, (offset - i) * 60, 160, 32);
+            Add(new ButtonBlock(class_, (obj) => ui.class_ = class_)).Center(0, (offset - i) * 60, 160, 32);
         }
     }
 }
@@ -270,29 +295,71 @@ public class LevelMenuBlock : MultiBlock
         for (int i = 0; i < _levels.Count; i++)
         {
             string level = _levels[i];
-            Add(new ButtonBlock(level, () => ui.level = level)).Center(0, (offset - i) * 60, 160, 32);
+            Add(new ButtonBlock(level, (obj) => ui.level = level)).Center(0, (offset - i) * 60, 160, 32);
         }
     }
 }
 
 public class RewardMenuBlock : MultiBlock
 {
-    public RewardMenuBlock(Interface ui)
+    private readonly Spell rewardSpell;
+    private readonly List<RelicData> rewardRelics;
+
+    private readonly List<string> _spell_sprites = new() {
+        "ProjectUtumno_full_1910",
+        "ProjectUtumno_full_1908",
+        "ProjectUtumno_full_1915",
+        "ProjectUtumno_full_1911",
+        "ProjectUtumno_full_1906",
+        "ProjectUtumno_full_2002",
+        "ProjectUtumno_full_1951",
+        "ProjectUtumno_full_1998",
+        "ProjectUtumno_full_2005",
+        "ProjectUtumno_full_2027",
+        "ProjectUtumno_full_2031",
+        "ProjectUtumno_full_2037",
+        "ProjectUtumno_full_2039",
+        "ProjectUtumno_full_2041",
+        "ProjectUtumno_full_2130",
+        "ProjectUtumno_full_2132",
+        "ProjectUtumno_full_2135",
+        "ProjectUtumno_full_2198",
+    };
+    private readonly List<string> _relic_sprites = new() {
+        "",
+    };
+    
+    public RewardMenuBlock(Interface ui, Spell rewardSpell, List<RelicData> rewardRelics)
     {
+        this.rewardSpell = rewardSpell;
+        this.rewardRelics = rewardRelics;
+        
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
         Add(new TextBlock("Pick your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
         Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 175, 200, 200);
 
-        Add(new ButtonBlock("Accept", () => {})).Center(0, 20, 160, 32);
+        Sprite rewardSpellSprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[rewardSpell.GetIcon()]);
+        
+        Add(new ImageBlock(rewardSpellSprite)).Center(0, 175, 175, 175);
 
-        for (int i = 0; i < 3; i++) {
+        var acceptBtn = Add(new ButtonBlock("Accept", (obj) => {
+            var pc = GameManager.Instance.player.GetComponent<PlayerController>();
+
+            if (pc.spellcaster.spells.Count < 4)
+            {
+                pc.spellcaster.spells.Add(rewardSpell);
+                obj.go.SetActive(false);
+            }
+        })).Center(0, 20, 160, 32);
+
+        for (int i = 0; i < rewardRelics.Count(); i++) {
             Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(200 * (i - 1), -100, 100, 100);
             Add(new ButtonBlock("Take")).Center(200 * (i - 1), -190, 160, 32);
         }
 
-        Add(new ButtonBlock("Continue", () =>
+        Add(new ButtonBlock("Continue", (obj) =>
             GameManager.Instance.state = GameManager.GameState.WAVEEND
         )).Center(0, -270, 160, 32);
     }
@@ -303,7 +370,7 @@ public class ButtonBlock : MultiBlock
     private readonly TextBlock _text;
     private int _clicksPending;
 
-    public ButtonBlock(string text, Action? action = null)
+    public ButtonBlock(string text, Action<Block>? action = null)
     {
         var image = go.AddComponent<Image>();
         image.sprite = Sprites.Get("Sprites/UI/button", "button");
@@ -311,7 +378,7 @@ public class ButtonBlock : MultiBlock
 
         var button = go.AddComponent<Button>();
         button.onClick.AddListener(() => _clicksPending++);
-        if (action != null) button.onClick.AddListener(() => action.Invoke());
+        if (action != null) button.onClick.AddListener(() => action.Invoke(this));
 
         _text = new TextBlock(text, 0xffffff);
         Add(_text).Center(0, 0);
