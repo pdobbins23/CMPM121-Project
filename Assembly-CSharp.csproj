@@ -73,6 +73,7 @@
     <Compile Include="Assets/Scripts/Projectiles/StraightProjectileMovement.cs" />
     <Compile Include="Assets/Scripts/Spells/DropSpellButton.cs" />
     <Compile Include="Assets/Scripts/DamageSystem/Hittable.cs" />
+    <Compile Include="Assets/Scripts/Core/AudioManager.cs" />
     <Compile Include="Assets/Scripts/Internal/SpriteView.cs" />
     <Compile Include="Assets/Scripts/UI/ManaBar.cs" />
     <Compile Include="Assets/Scripts/UI/RewardScreenManager.cs" />
