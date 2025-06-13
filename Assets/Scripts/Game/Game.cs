@@ -408,13 +408,76 @@ public class RewardMenuBlock : MultiBlock
 
 public class CraftingMenuBlock : MultiBlock
 {
+    struct SpellItem
+    {
+        public Spell spell;
+        public ImageBlock icon;
+
+        public SpellItem(Spell spell, ImageBlock icon)
+        {
+            this.spell = spell;
+            this.icon = icon;
+        }
+    }
+
+    private List<SpellItem> _items = new();
+
+    private SpellItem _item_a;
+    private SpellItem _item_b;
+
+    private readonly List<string> _spell_sprites = new() {
+        "ProjectUtumno_full_1910",
+        "ProjectUtumno_full_1908",
+        "ProjectUtumno_full_1915",
+        "ProjectUtumno_full_1911",
+        "ProjectUtumno_full_1906",
+        "ProjectUtumno_full_2002",
+        "ProjectUtumno_full_1951",
+        "ProjectUtumno_full_1998",
+        "ProjectUtumno_full_2005",
+        "ProjectUtumno_full_2027",
+        "ProjectUtumno_full_2031",
+        "ProjectUtumno_full_2037",
+        "ProjectUtumno_full_2039",
+        "ProjectUtumno_full_2041",
+        "ProjectUtumno_full_2130",
+        "ProjectUtumno_full_2132",
+        "ProjectUtumno_full_2135",
+        "ProjectUtumno_full_2198",
+    };
+    
     public CraftingMenuBlock(Interface ui)
     {
+        var pc = GameManager.Instance.player.GetComponent<PlayerController>();
+        var spells = pc.spellcaster.spells;
+
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
+
+        for (int i = 0; i < spells.Count(); i++)
+        {
+            var spell = spells[i];
+            var item = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
+
+            Add(item.icon).Center(150 * (i - 1), 300, 100, 100);
+
+            Add(new ButtonBlock("Select", (obj) => {
+                
+            })).Center(150 * (i - 1), 225, 100, 32);
+        }
+
+        _item_a = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
+        _item_b = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
+
+        Add(_item_a.icon).Center(-200, 0, 200, 200);
+        Add(_item_b.icon).Center(200, 0, 200, 200);
+
+        Add(new ButtonBlock("Craft", (obj) => {
+            
+        })).Center(0, -150, 200, 50);
 
         Add(new ButtonBlock("Close", (obj) => {
             go.SetActive(false);
-        })).Center(0, 0, 160, 32);
+        })).Center(0, -300, 160, 32);
     }
 }
 
