@@ -15,15 +15,10 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
+        if (Instance != null) throw new InvalidOperationException("Cannot initialize AudioManager multiple times");
+        Instance = this;
+
+        DontDestroyOnLoad(this.gameObject);
     }
 
     private void Start()
