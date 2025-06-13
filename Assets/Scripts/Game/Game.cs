@@ -426,6 +426,11 @@ public class CraftingMenuBlock : MultiBlock
     private SpellItem _item_a = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
     private SpellItem _item_b = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
 
+    private Block _item_a_rmbtn;
+    private Block _item_b_rmbtn;
+
+    private Block _craft_btn;
+
     private readonly List<string> _spell_sprites = new() {
         "ProjectUtumno_full_1910",
         "ProjectUtumno_full_1908",
@@ -453,9 +458,18 @@ public class CraftingMenuBlock : MultiBlock
         Add(_item_a.icon).Center(-200, 0, 200, 200);
         Add(_item_b.icon).Center(200, 0, 200, 200);
 
-        Add(new ButtonBlock("Craft", (obj) => {
+        _item_a_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
+            _craft_btn.go.SetActive(false);
+        })).Center(-200, 220, 160, 32);
+
+        _item_b_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
+            _craft_btn.go.SetActive(false);
+        })).Center(200, 220, 160, 32);
+
+        _craft_btn = Add(new ButtonBlock("Craft", (obj) => {
             
         })).Center(0, -150, 200, 50);
+        _craft_btn.go.SetActive(false);
 
         Add(new ButtonBlock("Close", (obj) => {
             go.SetActive(false);
@@ -476,10 +490,35 @@ public class CraftingMenuBlock : MultiBlock
             var spell = spells[i];
             var item = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
 
-            Add(item.icon).Center(150 * (i - 1), 300, 100, 100);
+            _items.Add(item);
+
+            var icon = Add(item.icon).Center(150 * (i - 1), 300, 100, 100);
 
             Add(new ButtonBlock("Select", (obj) => {
-                
+                if (_item_a.spell == null)
+                {
+                    GameObject.Destroy(_item_a.icon.go);
+                    GameObject.Destroy(_items[i].icon.go);
+
+                    _item_a = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
+                    Add(_item_a.icon).Center(-200, 0, 200, 200);
+
+                    _items[i] = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
+                    Add(_items[i].icon).Center(150 * (i - 1), 300, 100, 100);
+                }
+                else if (_item_b.spell == null)
+                {
+                    GameObject.Destroy(_item_b.icon.go);
+                    GameObject.Destroy(_items[i].icon.go);
+
+                    _item_b = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
+                    Add(_item_b.icon).Center(200, 0, 200, 200);
+
+                    _items[i] = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
+                    Add(_items[i].icon).Center(150 * (i - 1), 300, 100, 100);
+
+                    _craft_btn.go.SetActive(true);
+                }
             })).Center(150 * (i - 1), 225, 100, 32);
         }
 
