@@ -326,7 +326,22 @@ public class RewardMenuBlock : MultiBlock
         "ProjectUtumno_full_2198",
     };
     private readonly List<string> _relic_sprites = new() {
-        "",
+        "ProjectUtumno_full_823",
+        "ProjectUtumno_full_865",
+        "ProjectUtumno_full_1879",
+        "ProjectUtumno_full_1896",
+        "ProjectUtumno_full_1897",
+        "ProjectUtumno_full_2220",
+        "ProjectUtumno_full_2237",
+        "ProjectUtumno_full_2238",
+        "ProjectUtumno_full_2239",
+        "ProjectUtumno_full_2287",
+        "ProjectUtumno_full_2549",
+        "ProjectUtumno_full_2569",
+        "ProjectUtumno_full_2617",
+        "ProjectUtumno_full_2620",
+        "ProjectUtumno_full_2770",
+        "ProjectUtumno_full_5417",
     };
     
     public RewardMenuBlock(Interface ui, Spell rewardSpell, List<RelicData> rewardRelics)
@@ -357,14 +372,31 @@ public class RewardMenuBlock : MultiBlock
             }
         })).Center(0, 10, 160, 32);
 
+        var takeRelicButtons = new List<Block>();
+
         for (int i = 0; i < rewardRelics.Count(); i++) {
-            Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(200 * (i - 1), -100, 100, 100);
-            Add(new ButtonBlock("Take")).Center(200 * (i - 1), -190, 160, 32);
+            var rewardRelic = rewardRelics[i];
+            
+            Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(250 * (i - 1), -100, 100, 100);
+
+            Sprite rewardRelicSprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _relic_sprites[rewardRelic.sprite]);
+
+            Add(new ImageBlock(rewardRelicSprite)).Center(250 * (i - 1), -100, 75, 75);
+            Add(new TextBlock(rewardRelic.name, 0x333333)).Center(250 * (i - 1), -190, 300, 32);
+
+            var btn = Add(new ButtonBlock("Take", (obj) => {
+                foreach (var btn in takeRelicButtons)
+                    btn.go.SetActive(false);
+
+                RelicManager.Instance.ActiveRelics.Add(new Relic(rewardRelic));
+            })).Center(250 * (i - 1), -230, 160, 32);
+
+            takeRelicButtons.Add(btn);
         }
 
         Add(new ButtonBlock("Continue", (obj) =>
             GameManager.Instance.state = GameManager.GameState.WAVEEND
-        )).Center(0, -270, 160, 32);
+        )).Center(0, -300, 160, 32);
     }
 }
 
