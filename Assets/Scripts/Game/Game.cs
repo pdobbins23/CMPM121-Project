@@ -351,6 +351,8 @@ public class RewardMenuBlock : MultiBlock
             {
                 pc.spellcaster.spells.Add(rewardSpell);
                 obj.go.SetActive(false);
+
+                // TODO: Update player spell UI?
             }
         })).Center(0, 20, 160, 32);
 
