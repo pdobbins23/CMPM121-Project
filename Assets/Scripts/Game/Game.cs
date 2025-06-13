@@ -461,12 +461,16 @@ public class CraftingMenuBlock : MultiBlock
         _item_a_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
             _craft_btn.go.SetActive(false);
             _item_a_rmbtn.go.SetActive(false);
+
+            // TODO: Actually reset the thing
         })).Center(-200, 180, 100, 32);
         _item_a_rmbtn.go.SetActive(false);
 
         _item_b_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
             _craft_btn.go.SetActive(false);
             _item_b_rmbtn.go.SetActive(false);
+
+            // TODO: Actually reset the thing
         })).Center(200, 180, 100, 32);
         _item_b_rmbtn.go.SetActive(false);
 
