@@ -460,11 +460,15 @@ public class CraftingMenuBlock : MultiBlock
 
         _item_a_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
             _craft_btn.go.SetActive(false);
-        })).Center(-200, 220, 160, 32);
+            _item_a_rmbtn.go.SetActive(false);
+        })).Center(-200, 180, 100, 32);
+        _item_a_rmbtn.go.SetActive(false);
 
         _item_b_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
             _craft_btn.go.SetActive(false);
-        })).Center(200, 220, 160, 32);
+            _item_b_rmbtn.go.SetActive(false);
+        })).Center(200, 180, 100, 32);
+        _item_b_rmbtn.go.SetActive(false);
 
         _craft_btn = Add(new ButtonBlock("Craft", (obj) => {
             
@@ -482,11 +486,16 @@ public class CraftingMenuBlock : MultiBlock
             GameObject.Destroy(spellItem.icon.go);
         _items = new();
         
+        _item_a_rmbtn.go.SetActive(false);
+        _item_b_rmbtn.go.SetActive(false);
+
         var pc = GameManager.Instance.player.GetComponent<PlayerController>();
         var spells = pc.spellcaster.spells;
 
-        for (int i = 0; i < spells.Count(); i++)
+        for (int idx = 0; idx < spells.Count(); idx++)
         {
+            int i = idx;
+            
             var spell = spells[i];
             var item = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
 
@@ -505,6 +514,10 @@ public class CraftingMenuBlock : MultiBlock
 
                     _items[i] = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
                     Add(_items[i].icon).Center(150 * (i - 1), 300, 100, 100);
+
+                    obj.go.SetActive(false);
+
+                    _item_a_rmbtn.go.SetActive(true);
                 }
                 else if (_item_b.spell == null)
                 {
@@ -516,6 +529,10 @@ public class CraftingMenuBlock : MultiBlock
 
                     _items[i] = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
                     Add(_items[i].icon).Center(150 * (i - 1), 300, 100, 100);
+
+                    obj.go.SetActive(false);
+
+                    _item_b_rmbtn.go.SetActive(true);
 
                     _craft_btn.go.SetActive(true);
                 }
