@@ -132,7 +132,7 @@ public class Spell
     private void FireProjectile(Vector3 where, Vector3 dir)
     {
         string baseTrajectory = rawSpell.ProjectileTrajectory ?? rawSpell.BaseProjectile?.Trajectory;
-        
+
         GameManager.Instance.projectileManager.CreateProjectile(
             rawSpell.Icon, baseTrajectory, where, dir, GetBaseProjectileSpeed(), OnHit, GetBaseLifeTime());
     }
@@ -143,7 +143,7 @@ public class Spell
         float spray = GetSpray();
 
         var rnd = new System.Random();
-        
+
         for (int i = 0; i < count; i++)
         {
             Vector3 finalDir = dir;

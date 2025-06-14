@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 public class RelicManager
 {
-    public List<RelicData> AllRelics = new List<RelicData>();
+    public List<Relic> AllRelics = new List<Relic>();
     public List<Relic> ActiveRelics = new List<Relic>();
 
     private static RelicManager theInstance;
@@ -30,7 +30,7 @@ public class RelicManager
         JArray relicArray = JArray.Parse(jsonFile.text);
         foreach (var relic in relicArray.Children<JObject>())
         {
-            AllRelics.Add(relic.ToObject<RelicData>());
+            AllRelics.Add(new Relic(relic.ToObject<RelicData>()));
         }
     }
 

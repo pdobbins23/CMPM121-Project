@@ -64,11 +64,18 @@ public class MultiBlock : Block
 
     public MultiBlock() { }
 
-    public Block Add(Block child)
+    protected Block Add(Block child)
     {
         child.go.transform.SetParent(go.transform, false);
         _children.Add(child);
         return child;
+    }
+
+    protected void Clear()
+    {
+        foreach (var block in _children)
+            GameObject.Destroy(block.go);
+        _children.Clear();
     }
 
     public void Attach()

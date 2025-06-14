@@ -37,18 +37,26 @@ public class Relic
     private float timer = 0f;
     private float distancedMoved = 0;
     private PlayerController player;
+    private bool _registered = false;
 
     public Relic(RelicData relicData)
     {
         data = relicData;
         Name = relicData.name;
         // Icon = RelicIconManager.GetSpriteById(data.sprite);
-        RegisterTrigger();
         player = GameManager.Instance.player.GetComponent<PlayerController>();
     }
 
+    public int GetIcon() => data.sprite;
+
     public void Update()
     {
+        if (!_registered)
+        {
+            RegisterTrigger();
+            _registered = true;
+        }
+
         if (data.trigger.type == "stand-still")
         {
             if (GameManager.Instance.player.GetComponent<Rigidbody2D>().linearVelocity.sqrMagnitude < 1)

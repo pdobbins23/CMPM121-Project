@@ -58,14 +58,15 @@
         "cooldown": "2",
         "projectile": {"trajectory": "wave", "speed": "2.3", "sprite": 0}
     },
+
     "waver": {
         "name": "waver",
         "description": "A straight-wave bolt.",
+        "modifier": true,
         "damage_multiplier": "2",
         "mana_adder": "7",
         "projectile_trajectory": "wave"
     },
-
     "damage_amp": {
         "name": "damage-amplified",
         "description": "Increased damage and increased mana cost.",

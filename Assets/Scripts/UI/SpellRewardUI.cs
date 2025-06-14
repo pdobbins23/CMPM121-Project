@@ -31,6 +31,7 @@ public class SpellRewardUI : MonoBehaviour
 
     public void Show(Spell newSpell, SpellCaster caster)
     {
+        /*
         rewardSpell = newSpell;
         player = caster;
 
@@ -89,5 +90,6 @@ public class SpellRewardUI : MonoBehaviour
         }
 
         panel.SetActive(true);
+        */
     }
 }

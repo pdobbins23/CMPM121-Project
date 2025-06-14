@@ -118,26 +118,26 @@ public class InterfaceBlock : MultiBlock
         if (_rewardMenu == null && GameManager.Instance.state == GameManager.GameState.ENDINGWAVE)
         {
             PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
-            
+
             var rewardSpell = new SpellBuilder().GetRandomSpell(pc.spellcaster);
-            var rewardRelics = new List<RelicData>();
+            var rewardRelics = new List<Relic>();
 
             var rnd = new System.Random();
             var ar = RelicManager.Instance.AllRelics;
             var r = RelicManager.Instance.ActiveRelics;
 
             var availableRelics = ar
-                .Where(data => !r.Any(active => active.Name == data.name))
+                .Where(data => !r.Any(active => active.Name == data.Name))
                 .ToList();
 
             for (int i = 0; i < 3; i++)
             {
                 var eligible = availableRelics
-                    .Where(data => !rewardRelics.Any(chosen => chosen.name == data.name))
+                    .Where(data => !rewardRelics.Any(chosen => chosen.Name == data.Name))
                     .ToList();
 
                 if (eligible.Count() == 0) break;
-                
+
                 rewardRelics.Add(eligible[rnd.Next(eligible.Count())]);
             }
 
@@ -154,14 +154,11 @@ public class InterfaceBlock : MultiBlock
 
 public class InventoryBlock : MultiBlock
 {
-    List<ItemBlock> _items = new();
     public InventoryBlock() { } // List<ItemSlot> inventory
 
     public void Refresh()
     {
-        foreach (var item in _items)
-            GameObject.Destroy(item.go);
-        _items = new();
+        Clear();
 
         if (GameManager.Instance.player == null) return;
         PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
@@ -171,9 +168,7 @@ public class InventoryBlock : MultiBlock
         {
             var slot = new ItemSlot(i < pc.spellcaster.spells.Count ? new Item(pc.spellcaster.spells[i]) : null);
             slot.Highlighted = pc.currentSpell == i;
-            var block = new ItemBlock(slot);
-            _items.Add(block);
-            Add(block).At(i * (64 + 8), 0, 64, 64);
+            Add(new ItemBlock(slot)).At(i * (64 + 8), 0, 64, 64);
         }
     }
 }
@@ -200,34 +195,68 @@ public class ItemBlock : MultiBlock
         "ProjectUtumno_full_2135",
         "ProjectUtumno_full_2198",
     };
+    private readonly List<string> _relic_sprites = new() {
+        "ProjectUtumno_full_823",
+        "ProjectUtumno_full_865",
+        "ProjectUtumno_full_1879",
+        "ProjectUtumno_full_1896",
+        "ProjectUtumno_full_1897",
+        "ProjectUtumno_full_2220",
+        "ProjectUtumno_full_2237",
+        "ProjectUtumno_full_2238",
+        "ProjectUtumno_full_2239",
+        "ProjectUtumno_full_2287",
+        "ProjectUtumno_full_2549",
+        "ProjectUtumno_full_2569",
+        "ProjectUtumno_full_2617",
+        "ProjectUtumno_full_2620",
+        "ProjectUtumno_full_2770",
+        "ProjectUtumno_full_5417",
+    };
+
+    private readonly ItemSlot _slot;
 
     public ItemBlock(ItemSlot slot)
     {
-        Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 0, 64, 64);
-        Add(new RectBlock(slot.Highlighted ? 0xff0000 : 0x000000)).Center(0, 0, 52, 52);
+        _slot = slot;
+    }
 
-        if (slot.Item == null)
+    public override Block Sized(float width, float height)
+    {
+        if (width != height) throw new ArgumentException("Width and height must be equal.");
+        float s = width / 64;
+
+        Clear();
+        Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 0, 64 * s, 64 * s);
+        Add(new RectBlock(_slot.Highlighted ? 0xff0000 : 0x000000)).Center(0, 0, 52 * s, 52 * s);
+
+        if (_slot.Item?.Spell is Spell spell)
         {
-            Add(new RectBlock(0xfff1d2)).Center(0, 0, 46, 46);
-        }
-        else if (slot.Item.Spell != null)
-        {
-            Spell spell = slot.Item.Spell;
+            Debug.Log($"index={spell.GetIcon()}");
+            Debug.Log($"name={_spell_sprites[spell.GetIcon()]}");
             Sprite sprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()]);
             float sinceLast = Time.time - spell.LastCast();
             float ratioLeft = sinceLast > spell.GetCoolDown() ? 0 : 1 - sinceLast / spell.GetCoolDown();
 
-            Add(new ImageBlock(sprite)).Center(0, 0, 48, 48);
-            Add(new RectBlock(0x888888, 0.5f)).Center(-24 + 24 * ratioLeft, 0, 48 * ratioLeft, 48);
-            Add(new RectBlock(0xffffff)).Center(12, -16, 24, 16);
-            Add(new RectBlock(0xffffff)).Center(-12, 16, 24, 16);
-            Add(new TextBlock(Util.FormatShort(spell.GetManaCost()), 0x0000ff)).Center(12, -16, 24, 12);
-            Add(new TextBlock(Util.FormatShort((int) spell.GetBaseDamage()), 0xff0000)).Center(-12, 16, 24, 12);
+            Add(new ImageBlock(sprite)).Center(0, 0, 48 * s, 48 * s);
+            Add(new RectBlock(0x888888, 0.5f)).Center((-24 + 24 * ratioLeft) * s, 0, 48 * ratioLeft * s, 48 * s);
+            Add(new RectBlock(0xffffff)).Center(12 * s, -16 * s, 24 * s, 16 * s);
+            Add(new RectBlock(0xffffff)).Center(-12 * s, 16 * s, 24 * s, 16 * s);
+            Add(new TextBlock(Util.FormatShort(spell.GetManaCost()), 0x0000ff)).Center(12 * s, -16 * s, 24 * s, 12 * s);
+            Add(new TextBlock(Util.FormatShort((int) spell.GetBaseDamage()), 0xff0000)).Center(-12 * s, 16 * s, 24 * s, 12 * s);
         }
-        else if (slot.Item.Relic != null)
+        else if (_slot.Item?.Relic is Relic relic)
         {
-            // TODO
+            Sprite sprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _relic_sprites[relic.GetIcon()]);
+
+            Add(new ImageBlock(sprite)).Center(0, 0, 48 * s, 48 * s);
         }
+        else
+        {
+            Add(new RectBlock(0xfff1d2)).Center(0, 0, 46 * s, 46 * s);
+        }
+
+        return base.Sized(width, height);
     }
 }
 
@@ -302,7 +331,7 @@ public class LevelMenuBlock : MultiBlock
 public class RewardMenuBlock : MultiBlock
 {
     private readonly Spell rewardSpell;
-    private readonly List<RelicData> rewardRelics;
+    private readonly List<Relic> rewardRelics;
 
     private readonly CraftingMenuBlock craftingMenu;
 
@@ -344,12 +373,12 @@ public class RewardMenuBlock : MultiBlock
         "ProjectUtumno_full_2770",
         "ProjectUtumno_full_5417",
     };
-    
-    public RewardMenuBlock(Interface ui, Spell rewardSpell, List<RelicData> rewardRelics)
+
+    public RewardMenuBlock(Interface ui, Spell rewardSpell, List<Relic> rewardRelics)
     {
         this.rewardSpell = rewardSpell;
         this.rewardRelics = rewardRelics;
-        
+
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
         Add(new ButtonBlock("Craft", (obj) => {
@@ -359,12 +388,11 @@ public class RewardMenuBlock : MultiBlock
 
         Add(new TextBlock("Pick your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
-        Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 175, 200, 200);
+        // Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 175, 200, 200);
         Add(new TextBlock(rewardSpell.GetName(), 0x333333)).Center(0, 50, 750, 32);
-
-        Sprite rewardSpellSprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[rewardSpell.GetIcon()]);
-        
-        Add(new ImageBlock(rewardSpellSprite)).Center(0, 175, 175, 175);
+        // Sprite rewardSpellSprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[rewardSpell.GetIcon()]);
+        // Add(new ImageBlock(rewardSpellSprite)).Center(0, 175, 175, 175);
+        Add(new ItemBlock(new ItemSlot(new Item(rewardSpell)))).Center(0, 175, 200, 200);
 
         var acceptBtn = Add(new ButtonBlock("Accept", (obj) => {
             var pc = GameManager.Instance.player.GetComponent<PlayerController>();
@@ -374,25 +402,28 @@ public class RewardMenuBlock : MultiBlock
                 pc.spellcaster.spells.Add(rewardSpell);
                 obj.go.SetActive(false);
             }
+
+            Debug.Log("spells:");
+            Debug.Log(JsonUtility.ToJson(pc.spellcaster.spells));
+            // foreach (Spell s in pc.spellcaster.spells)
+            //     Debug.Log($"" rawSpell);
+
         })).Center(0, 10, 160, 32);
 
         var takeRelicButtons = new List<Block>();
 
         for (int i = 0; i < rewardRelics.Count(); i++) {
             var rewardRelic = rewardRelics[i];
-            
-            Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(250 * (i - 1), -100, 100, 100);
 
-            Sprite rewardRelicSprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _relic_sprites[rewardRelic.sprite]);
+            Add(new ItemBlock(new ItemSlot(new Item(rewardRelic)))).Center(250 * (i - 1), -100, 100, 100);
 
-            Add(new ImageBlock(rewardRelicSprite)).Center(250 * (i - 1), -100, 75, 75);
-            Add(new TextBlock(rewardRelic.name, 0x333333)).Center(250 * (i - 1), -190, 300, 32);
+            Add(new TextBlock(rewardRelic.Name, 0x333333)).Center(250 * (i - 1), -190, 300, 32);
 
             var btn = Add(new ButtonBlock("Take", (obj) => {
                 foreach (var btn in takeRelicButtons)
                     btn.go.SetActive(false);
 
-                RelicManager.Instance.ActiveRelics.Add(new Relic(rewardRelic));
+                RelicManager.Instance.ActiveRelics.Add(rewardRelic);
             })).Center(250 * (i - 1), -230, 160, 32);
 
             takeRelicButtons.Add(btn);
@@ -411,10 +442,10 @@ public class CraftingMenuBlock : MultiBlock
 {
     struct SpellItem
     {
-        public Spell spell;
+        public Spell? spell;
         public ImageBlock icon;
 
-        public SpellItem(Spell spell, ImageBlock icon)
+        public SpellItem(Spell? spell, ImageBlock icon)
         {
             this.spell = spell;
             this.icon = icon;
@@ -451,7 +482,7 @@ public class CraftingMenuBlock : MultiBlock
         "ProjectUtumno_full_2135",
         "ProjectUtumno_full_2198",
     };
-    
+
     public CraftingMenuBlock(Interface ui) {
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
@@ -461,7 +492,6 @@ public class CraftingMenuBlock : MultiBlock
         _item_a_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
             _craft_btn.go.SetActive(false);
             _item_a_rmbtn.go.SetActive(false);
-
             // TODO: Actually reset the thing
         })).Center(-200, 180, 100, 32);
         _item_a_rmbtn.go.SetActive(false);
@@ -469,13 +499,12 @@ public class CraftingMenuBlock : MultiBlock
         _item_b_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
             _craft_btn.go.SetActive(false);
             _item_b_rmbtn.go.SetActive(false);
-
             // TODO: Actually reset the thing
         })).Center(200, 180, 100, 32);
         _item_b_rmbtn.go.SetActive(false);
 
         _craft_btn = Add(new ButtonBlock("Craft", (obj) => {
-            
+
         })).Center(0, -150, 200, 50);
         _craft_btn.go.SetActive(false);
 
@@ -489,7 +518,7 @@ public class CraftingMenuBlock : MultiBlock
         foreach (var spellItem in _items)
             GameObject.Destroy(spellItem.icon.go);
         _items = new();
-        
+
         _item_a_rmbtn.go.SetActive(false);
         _item_b_rmbtn.go.SetActive(false);
 
@@ -499,7 +528,7 @@ public class CraftingMenuBlock : MultiBlock
         for (int idx = 0; idx < spells.Count(); idx++)
         {
             int i = idx;
-            
+
             var spell = spells[i];
             var item = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
 
