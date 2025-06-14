@@ -9,7 +9,7 @@ using System.Collections.Generic;
 public class PlayerController : MonoBehaviour
 {
     public PlayerClass playerClass;
-    
+
     public Hittable hp;
     public HealthBar healthui;
     public ManaBar manaui;
@@ -32,13 +32,13 @@ public class PlayerController : MonoBehaviour
     public void StartLevel()
     {
         spellcaster = new SpellCaster(125, 8, Hittable.Team.PLAYER);
-        
+
         Spell startingSpell = new Spell(SpellManager.Instance.AllSpells["arcane_bolt"], spellcaster);
-        
+
         spellcaster.spells.Add(startingSpell);
-        
+
         StartCoroutine(spellcaster.ManaRegeneration());
-        
+
         hp = new Hittable(100, Hittable.Team.PLAYER, gameObject);
         hp.OnDeath += Die;
         hp.team = Hittable.Team.PLAYER;
@@ -47,17 +47,6 @@ public class PlayerController : MonoBehaviour
         healthui.SetHealth(hp);
         manaui.SetSpellCaster(spellcaster);
         spellui[0].GetComponent<SpellUI>().SetSpell(spellcaster.spells[0]);
-
-        // test
-        // Spell spell2 = new Spell(SpellManager.Instance.AllSpells["arcane_blast"], spellcaster);
-        // Spell spell3 = new Spell(SpellManager.Instance.AllSpells["magic_missile"], spellcaster);
-        // Spell spell4 = new Spell(SpellManager.Instance.AllSpells["arcane_spray"], spellcaster);
-        // spellcaster.spells.Add(spell2);
-        // spellcaster.spells.Add(spell3);
-        // spellcaster.spells.Add(spell4);
-        // spellui[1].GetComponent<SpellUI>().SetSpell(spellcaster.spells[1]);
-        // spellui[2].GetComponent<SpellUI>().SetSpell(spellcaster.spells[2]);
-        // spellui[3].GetComponent<SpellUI>().SetSpell(spellcaster.spells[3]);
     }
 
     // Update is called once per frame
@@ -119,7 +108,7 @@ public class PlayerController : MonoBehaviour
     void Die()
     {
         Debug.Log("You Lost");
-        
+
         GameManager.Instance.state = GameManager.GameState.GAMEOVER;
     }
 
