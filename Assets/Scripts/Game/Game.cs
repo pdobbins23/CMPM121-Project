@@ -129,13 +129,13 @@ public class InterfaceBlock : MultiBlock
             var r = RelicManager.Instance.ActiveRelics;
 
             var availableRelics = ar
-                .Where(data => !r.Any(active => active.Name == data.Name))
+                .Where(data => !r.Any(active => active.GetName() == data.GetName()))
                 .ToList();
 
             for (int i = 0; i < 3; i++)
             {
                 var eligible = availableRelics
-                    .Where(data => !rewardRelics.Any(chosen => chosen.Name == data.Name))
+                    .Where(data => !rewardRelics.Any(chosen => chosen.GetName() == data.GetName()))
                     .ToList();
 
                 if (eligible.Count() == 0) break;
@@ -261,7 +261,7 @@ public class ItemBlock : EventBlock
         }
         else
         {
-            Add(new RectBlock(0xfff1d2)).Center(0, 0, 46 * s, 46 * s);
+            Add(new RectBlock(_slot.TakeOnly ? 0xc2bbae : 0xfff1d2)).Center(0, 0, 46 * s, 46 * s);
         }
 
         if (_slot.Item != null && hovered)
@@ -289,12 +289,12 @@ public class ItemBlock : EventBlock
     {
         var pc = GameManager.Instance.player.GetComponent<PlayerController>();
         if (pc.InventorySlot == _slot)
-            pc.InventorySlot = new ItemSlot(null, false);
+            pc.InventorySlot = new ItemSlot(null, true);
         else if (pc.InventorySlot.Item != null && (_slot.Item == null && !_slot.TakeOnly))
         {
             _slot.Item = pc.InventorySlot.Item;
             pc.InventorySlot.Item = null;
-            pc.InventorySlot = new ItemSlot(null, false);
+            pc.InventorySlot = new ItemSlot(null, true);
         }
         else
             pc.InventorySlot = _slot;
@@ -326,6 +326,11 @@ public class TooltipBlock : EventBlock
         {
             Add(new TextBlock(spell.GetName(), 0xffffff, height * 0.1f)).At(0, height * 0.65f, width, height * 0.35f);
             Add(new TextBlock(spell.GetDescription(), 0xffffff, height * 0.07f)).At(0, 0, width, height * 0.7f);
+        }
+        else if (_slot.Item?.Relic is Relic relic)
+        {
+            Add(new TextBlock(relic.GetName(), 0xffffff, height * 0.1f)).At(0, height * 0.65f, width, height * 0.35f);
+            Add(new TextBlock(relic.GetDescription(), 0xffffff, height * 0.07f)).At(0, 0, width, height * 0.7f);
         }
 
         return base.Sized(width, height);
@@ -402,43 +407,29 @@ public class LevelMenuBlock : MultiBlock
 
 public class RewardMenuBlock : MultiBlock
 {
-    private readonly Spell rewardSpell;
-    private readonly List<Relic> rewardRelics;
-
     private readonly CraftingMenuBlock craftingMenu;
+
+    private readonly List<ItemSlot> relicItemSlots = new();
 
     public RewardMenuBlock(Interface ui, Spell rewardSpell, List<Relic> rewardRelics)
     {
-        this.rewardSpell = rewardSpell;
-        this.rewardRelics = rewardRelics;
-
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
         Add(new ButtonBlock("Craft", (obj) => {
             craftingMenu?.go.SetActive(true);
         })).Center(-350, 300, 160, 64);
 
-        Add(new TextBlock("Pick your rewards:", 0x333333)).Center(0, 325, 320, 32);
+        Add(new TextBlock("Grab your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
-        Add(new ItemBlock(new ItemSlot(new Item(rewardSpell), false))).Center(0, 175, 200, 200);
+        Add(new ItemBlock(new ItemSlot(new Item(rewardSpell), true))).Center(0, 175, 200, 200);
         Add(new TextBlock(rewardSpell.GetName(), 0x333333)).Center(0, 50, 750, 32);
 
-        var takeRelicButtons = new List<Block>();
-
-        for (int i = 0; i < rewardRelics.Count(); i++) {
+        for (int i = 0; i < rewardRelics.Count; i++) {
             var rewardRelic = rewardRelics[i];
-
-            Add(new ItemBlock(new ItemSlot(new Item(rewardRelic), false))).Center(250 * (i - 1), -100, 100, 100);
-            Add(new TextBlock(rewardRelic.Name, 0x333333)).Center(250 * (i - 1), -190, 300, 32);
-
-            var btn = Add(new ButtonBlock("Take", (obj) => {
-                foreach (var btn in takeRelicButtons)
-                    btn.go.SetActive(false);
-
-                RelicManager.Instance.ActiveRelics.Add(rewardRelic);
-            })).Center(250 * (i - 1), -230, 160, 32);
-
-            takeRelicButtons.Add(btn);
+            var slot = new ItemSlot(new Item(rewardRelic), true);
+            relicItemSlots.Add(slot);
+            Add(new ItemBlock(slot)).Center(250 * (i - 1), -100, 100, 100);
+            Add(new TextBlock(rewardRelic.GetName(), 0x333333)).Center(250 * (i - 1), -190, 300, 32);
         }
 
         Add(new ButtonBlock("Continue", (obj) =>
@@ -448,6 +439,14 @@ public class RewardMenuBlock : MultiBlock
         craftingMenu = (CraftingMenuBlock)Add(new CraftingMenuBlock(ui)).Center(0, 0, 1000, 800);
         craftingMenu.go.SetActive(false);
     }
+
+    public override void Refresh()
+    {
+        if (relicItemSlots.Any(slot => slot.Item == null))
+            foreach (var slot in relicItemSlots) slot.Item = null;
+
+        base.Refresh();
+    }
 }
 
 public class CraftingMenuBlock : MultiBlock
@@ -455,7 +454,7 @@ public class CraftingMenuBlock : MultiBlock
 
     private ItemSlot _item_left = new();
     private ItemSlot _item_right = new();
-    private ItemSlot _item_output = new(null, false);
+    private ItemSlot _item_output = new(null, true);
 
     private bool _has_crafted;
 
@@ -464,8 +463,8 @@ public class CraftingMenuBlock : MultiBlock
     public CraftingMenuBlock(Interface ui) {
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
-        Add(new ItemBlock(_item_left)).Center(-350, 0, 200, 200);
-        Add(new ItemBlock(_item_right)).Center(-100, 0, 200, 200);
+        Add(new ItemBlock(_item_left)).Center(-300, 0, 200, 200);
+        Add(new ItemBlock(_item_right)).Center(-50, 0, 200, 200);
         Add(new ItemBlock(_item_output)).Center(300, 0, 200, 200);
 
         _close_button = Add(new ButtonBlock("Close", (obj) => {
@@ -492,9 +491,12 @@ public class CraftingMenuBlock : MultiBlock
         if (_item_left.Item?.Spell is Spell a && _item_right.Item?.Spell is Spell b)
         {
             var crafted = RawSpell.CraftSpell(a.GetRaw(), b.GetRaw());
-            var pc = GameManager.Instance.player.GetComponent<PlayerController>();
-            _item_output.Item = new Item(new Spell(crafted, pc.spellcaster));
-            _has_crafted = true;
+            if (crafted != null)
+            {
+                var pc = GameManager.Instance.player.GetComponent<PlayerController>();
+                _item_output.Item = new Item(new Spell(crafted, pc.spellcaster));
+                _has_crafted = true;
+            }
         }
 
         _close_button.go.SetActive(_item_left.Item == null && _item_right.Item == null);

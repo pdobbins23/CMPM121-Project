@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 public class RelicManager
@@ -36,9 +37,20 @@ public class RelicManager
 
     public void Update()
     {
-        foreach (var relic in ActiveRelics)
+        var inventory = GameManager.Instance.player.GetComponent<PlayerController>().Inventory;
+
+        for (int i = ActiveRelics.Count - 1; i >= 0; i--)
         {
-            relic.Update();
+            var relic = ActiveRelics[i];
+
+            if (inventory.Any(slot => slot.Item?.Relic == relic))
+            {
+                relic.Update();
+                continue;
+            }
+
+            relic.UnregisterTrigger();
+            ActiveRelics.RemoveAt(i);
         }
     }
 }

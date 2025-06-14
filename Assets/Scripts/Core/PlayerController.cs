@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
         Spell startingSpell = new Spell(SpellManager.Instance.AllSpells["arcane_bolt"], spellcaster);
 
         Inventory.Clear();
-        for (int i = 0; i < 4; i++) Inventory.Add(new ItemSlot());
+        for (int i = 0; i < 8; i++) Inventory.Add(new ItemSlot());
 
         InventorySlot = Inventory[0];
         InventorySlot.Item = new Item(startingSpell);
@@ -60,6 +60,10 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSlot(Inventory[1]);
         if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(Inventory[2]);
         if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(Inventory[3]);
+        if (Input.GetKeyDown(KeyCode.Alpha5)) SelectSlot(Inventory[4]);
+        if (Input.GetKeyDown(KeyCode.Alpha6)) SelectSlot(Inventory[5]);
+        if (Input.GetKeyDown(KeyCode.Alpha7)) SelectSlot(Inventory[6]);
+        if (Input.GetKeyDown(KeyCode.Alpha8)) SelectSlot(Inventory[7]);
         if (Input.GetKeyDown(KeyCode.K)) GameManager.Instance.KillAllEnemies();
         RelicManager.Instance.Update();
     }

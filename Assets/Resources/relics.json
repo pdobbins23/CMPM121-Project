@@ -3,11 +3,11 @@
         "name": "Green Gem",
         "sprite": 0,
         "trigger": {
-            "description": "Whenever you take damage",
+            "description": "Whenever you take damage, ",
             "type": "take-damage"
         },
         "effect": {
-            "description": "you gain 5 mana",
+            "description": "you gain 5 mana.",
             "type": "gain-mana",
             "amount": "5"
         }
@@ -16,12 +16,12 @@
         "name": "Jade Elephant",
         "sprite": 1,
         "trigger": {
-            "description": "When you don't move for 3 seconds",
+            "description": "When you don't move for 3 seconds, ",
             "type": "stand-still",
             "amount": "3"
         },
         "effect": {
-            "description": "you gain 10 spellpower (+5/wave)",
+            "description": "you gain 10 spellpower. This effect increases by 5 spellpower per wave.",
             "type": "gain-spellpower",
             "amount": "10 + wave * 5",
             "until": "move"
@@ -31,7 +31,7 @@
         "name": "Golden Mask",
         "sprite": 2,
         "trigger": {
-            "description": "When you take damage",
+            "description": "When you take damage, ",
             "type": "take-damage"
         },
         "effect": {
@@ -45,7 +45,7 @@
         "name": "Cursed Scroll",
         "sprite": 3,
         "trigger": {
-            "description": "When you kill an enemy",
+            "description": "When you kill an enemy, ",
             "type": "on-kill"
         },
         "effect": {
@@ -58,7 +58,7 @@
         "name": "Crimson Rune",
         "sprite": 4,
         "trigger": {
-            "description": "When the player casts a spell",
+            "description": "When you cast a spell, ",
             "type": "on-cast"
         },
         "effect": {
@@ -71,7 +71,7 @@
         "name": "Silver Wind",
         "sprite": 5,
         "trigger": {
-            "description": "After moving 50 units",
+            "description": "After moving 50 units, ",
             "type": "move-distance",
             "amount": "50"
         },
@@ -86,7 +86,7 @@
         "name": "Lucky Charm",
         "sprite": 6,
         "trigger": {
-            "description": "At the start of each wave",
+            "description": "At the start of each wave, ",
             "type": "wave-start"
         },
         "effect": {
@@ -99,11 +99,11 @@
         "name": "Mysterious Mask",
         "sprite": 4,
         "trigger": {
-            "description": "When you kill an enemy",
+            "description": "When you kill an enemy, ",
             "type": "on-kill"
         },
         "effect": {
-            "description": "your speed gain 5 in 3 second",
+            "description": "your speed gain 5 in 3 second.",
             "type": "gain-speed",
             "amount": "5"
         }
@@ -112,11 +112,11 @@
         "name": "Knight Shield",
         "sprite": 5,
         "trigger": {
-            "description": "When your healthly lower than 15%",
+            "description": "When your health becomes lower than 15%, ",
             "type": "on-hurt"
         },
         "effect": {
-            "description": "Your healthly will gradully increase to 15%, each second increase 0.16%",
+            "description": "your healthly will gradully increase to 15%. Each second, your health increase by 0.16%.",
             "type": "gain-healthly",
             "amount": "0.16"
         }
@@ -125,11 +125,11 @@
         "name": "Golden Crown",
         "sprite": 9,
         "trigger": {
-            "description": "When you kill an enemy",
+            "description": "When you kill an enemy, ",
             "type": "on-kill"
         },
         "effect": {
-            "description": "your spell power s gain 25 in 3 second",
+            "description": "your gain 25 spellpowers in 3 second.",
             "type": "gain-spell-power",
             "amount": "25"
         }
@@ -138,11 +138,11 @@
         "name": "Grand Chronicle",
         "sprite": 10,
         "trigger": {
-            "description": "When your healthly lower than 25%",
+            "description": "When your healthly lower than 25%, ",
             "type": "on-hurt"
         },
         "effect": {
-            "description": "your spell power gains 20 additional",
+            "description": "your spell power gains 20 additional.",
             "type": "gain-spellpower",
             "amount": "20"
         }
@@ -151,11 +151,11 @@
         "name": "Red necklace",
         "sprite": 6,
         "trigger": {
-            "description": "When your take this relic increase healthly permanently",
+            "description": "When you earn this relic, ",
             "type": "one-time"
         },
         "effect": {
-            "description": "Your max healthly will increase",
+            "description": "increase your health permanently.",
             "type": "gain-healthly",
             "amount": "10 + wave * 5"
         }

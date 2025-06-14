@@ -29,9 +29,6 @@ public class RelicEffectData
 
 public class Relic
 {
-    public string Name { get; private set; }
-    // public Sprite Icon { get; private set; }
-
     private RelicData data;
     private bool effectActive = false;
     private float timer = 0f;
@@ -39,23 +36,28 @@ public class Relic
     private PlayerController player;
     private bool _registered = false;
 
+    private Action _onCastApply;
+    private Action _onCastRemove;
+    private Action<float> _onMoveRemove;
+    private Action<float> _onMoveApply;
+    private Action<Hittable> _onKill;
+    private Action<Vector3, Damage, Hittable> _onDamage;
+    private Action _onWaveStart;
+
     public Relic(RelicData relicData)
     {
         data = relicData;
-        Name = relicData.name;
-        // Icon = RelicIconManager.GetSpriteById(data.sprite);
         player = GameManager.Instance.player.GetComponent<PlayerController>();
     }
+
+    public string GetName() => data.name;
+    public string GetDescription() => data.trigger.description + data.effect.description;
 
     public int GetIcon() => data.sprite;
 
     public void Update()
     {
-        if (!_registered)
-        {
-            RegisterTrigger();
-            _registered = true;
-        }
+        RegisterTrigger();
 
         if (data.trigger.type == "stand-still")
         {
@@ -80,28 +82,34 @@ public class Relic
 
     private void RegisterTrigger()
     {
+        if (_registered) return;
+        _registered = true;
+
         switch (data.trigger.type)
         {
             case "on-cast":
-                EventBus.Instance.OnCast += () => ApplyEffect();
+                _onCastApply = () => ApplyEffect();
+                EventBus.Instance.OnCast += _onCastApply;
                 break;
 
             case "take-damage":
-                EventBus.Instance.OnDamage += (where, damage, target) =>
+                _onDamage = (where, damage, target) =>
                 {
                     if (target.owner == GameManager.Instance.player) ApplyEffect();
                 };
+                EventBus.Instance.OnDamage += _onDamage;
                 break;
 
             case "on-kill":
-                EventBus.Instance.OnKill += (target) =>
+                _onKill = (target) =>
                 {
                     if (target.owner != GameManager.Instance.player) ApplyEffect();
                 };
+                EventBus.Instance.OnKill += _onKill;
                 break;
 
             case "move-distance":
-                EventBus.Instance.OnMove += (distance) =>
+                _onMoveApply = (distance) =>
                 {
                     distancedMoved += distance;
                     if (distancedMoved >= float.Parse(data.trigger.amount))
@@ -110,21 +118,48 @@ public class Relic
                         ApplyEffect();
                     }
                 };
+                EventBus.Instance.OnMove += _onMoveApply;
                 break;
 
             case "wave-start":
-                GameManager.Instance.OnWaveStart += () => ApplyEffect();
+                _onWaveStart = () => ApplyEffect();
+                GameManager.Instance.OnWaveStart += _onWaveStart;
                 break;
         }
 
         if (data.effect.until == "cast-spell")
         {
-            EventBus.Instance.OnCast += () => RemoveEffectIfNeeded();
+            _onCastRemove = () => RemoveEffectIfNeeded();
+            EventBus.Instance.OnCast += _onCastRemove;
         }
         else if (data.effect.until == "move")
         {
-            EventBus.Instance.OnMove += (distance) => RemoveEffectIfNeeded();
+            _onMoveRemove = (distance) => RemoveEffectIfNeeded();
+            EventBus.Instance.OnMove += _onMoveRemove;
         }
+    }
+
+    public void UnregisterTrigger()
+    {
+        if (!_registered) return;
+        _registered = false;
+
+        if (_onCastApply != null) EventBus.Instance.OnCast -= _onCastApply;
+        if (_onCastRemove != null) EventBus.Instance.OnCast -= _onCastRemove;
+        if (_onDamage != null) EventBus.Instance.OnDamage -= _onDamage;
+        if (_onKill != null) EventBus.Instance.OnKill -= _onKill;
+        if (_onMoveApply != null) EventBus.Instance.OnMove -= _onMoveApply;
+        if (_onMoveRemove != null) EventBus.Instance.OnMove -= _onMoveRemove;
+        if (_onWaveStart != null) GameManager.Instance.OnWaveStart -= _onWaveStart;
+
+        // Null them out if you want to be extra clean
+        _onCastApply = null;
+        _onCastRemove = null;
+        _onDamage = null;
+        _onKill = null;
+        _onMoveApply = null;
+        _onMoveRemove = null;
+        _onWaveStart = null;
     }
 
     private void ApplyEffect()
