@@ -53,16 +53,13 @@ public class WaveManager : MonoBehaviour
         // pc.spellcaster.spell_power = GameManager.Instance.currentWave * 10;
         // pc.speed = 5;
 
-        var ctx = new Dictionary<string, float>
-        {
-            { "wave", GameManager.Instance.currentWave },
-        };
+        var ev = new Evaluator(new() { { "wave", GameManager.Instance.currentWave } });
 
-        pc.hp.hp = pc.hp.max_hp = RPN.EvalInt(pc.playerClass.health, ctx);
-        pc.spellcaster.mana = RPN.EvalInt(pc.playerClass.mana, ctx);
-        pc.spellcaster.mana_reg = RPN.EvalInt(pc.playerClass.mana_regeneration, ctx);
-        pc.spellcaster.spell_power = RPN.EvalInt(pc.playerClass.spellpower, ctx);
-        pc.speed = RPN.EvalInt(pc.playerClass.speed, ctx);
+        pc.hp.hp = pc.hp.max_hp = ev.EvaluateInt(pc.playerClass.health);
+        pc.spellcaster.mana = ev.EvaluateInt(pc.playerClass.mana);
+        pc.spellcaster.mana_reg = ev.EvaluateInt(pc.playerClass.mana_regeneration);
+        pc.spellcaster.spell_power = ev.EvaluateInt(pc.playerClass.spellpower);
+        pc.speed = ev.EvaluateInt(pc.playerClass.speed);
 
         StartCoroutine(SpawnWave());
     }
@@ -83,11 +80,9 @@ public class WaveManager : MonoBehaviour
         GameManager.Instance.totalEnemiesForWave = 0;
 
         foreach (var spawn in currentLevel.spawns) {
-            var vars = new Dictionary<string, float> {
-                { "wave", (float)GameManager.Instance.currentWave },
-            };
+            var ev = new Evaluator(new() { { "wave", (float)GameManager.Instance.currentWave } });
 
-            int totalCount = RPN.EvalInt(spawn.count, vars);
+            int totalCount = ev.EvaluateInt(spawn.count);
 
             GameManager.Instance.totalEnemiesForWave += totalCount;
 
@@ -135,13 +130,11 @@ public class WaveManager : MonoBehaviour
 
         new_enemy.GetComponent<SpriteRenderer>().sprite = GameManager.Instance.enemySpriteManager.Get(e.sprite);
 
-        var hpVars = new Dictionary<string, float> {
-            { "base", e.hp },
-            { "wave", wave },
-        };
-
         EnemyController en = new_enemy.GetComponent<EnemyController>();
-        en.hp = new Hittable(RPN.EvalInt(s.hp, hpVars), Hittable.Team.MONSTERS, new_enemy);
+
+        var ev = new Evaluator(new() { { "base", e.hp }, { "wave", wave } });
+
+        en.hp = new Hittable(ev.EvaluateInt(s.hp), Hittable.Team.MONSTERS, new_enemy);
         en.speed = e.speed;
 
         GameManager.Instance.AddEnemy(new_enemy);

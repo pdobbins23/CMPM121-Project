@@ -162,7 +162,6 @@ public class Relic
 
     private int EvaluateAmount(string expr)
     {
-        var ctx = player.spellcaster.GetContext().ToDictionary();
-        return (int) RPN.eval(expr, ctx);
+        return player.spellcaster.EvaluateInt(expr);
     }
 }

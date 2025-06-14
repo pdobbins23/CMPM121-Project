@@ -17,7 +17,7 @@ public class Spell
 
     public bool IsReady()
     {
-        return Time.time > lastCast + RPN.eval(rawSpell.Cooldown, owner.GetContext().ToDictionary());
+        return Time.time > lastCast + owner.Evaluate(rawSpell.Cooldown);
     }
 
     public float LastCast() => lastCast;
@@ -28,104 +28,80 @@ public class Spell
 
     public float GetDelay()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.Mod.Delay ?? "0", ctx);
+        return owner.Evaluate(rawSpell.Mod.Delay ?? "0");
     }
 
     public float GetAngle()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.Mod.Angle ?? "0", ctx);
+        return owner.Evaluate(rawSpell.Mod.Angle ?? "0");
     }
 
     public int GetCount()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.EvalInt(rawSpell.Count ?? "1", ctx);
+        return owner.EvaluateInt(rawSpell.Count ?? "1");
     }
 
     public float GetSpray()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.Spray ?? "0", ctx);
+        return owner.Evaluate(rawSpell.Spray ?? "0");
     }
 
     public float GetBaseLifetime()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.Projectile?.Lifetime ?? "100", ctx);
+        return owner.Evaluate(rawSpell.Projectile?.Lifetime ?? "100");
     }
 
     public float GetSecondaryLifetime()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.SecondaryProjectile?.Lifetime ?? "100", ctx);
+        return owner.Evaluate(rawSpell.SecondaryProjectile?.Lifetime ?? "100");
     }
 
     public int GetManaCost()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float manaCost = RPN.eval(rawSpell.ManaCost, ctx);
-        float manaAdder = RPN.eval(rawSpell.Mod.ManaAdder ?? "0", ctx);
-        float manaMultiplier = RPN.eval(rawSpell.Mod.ManaMultiplier ?? "1", ctx);
+        float manaCost = owner.Evaluate(rawSpell.ManaCost);
+        float manaAdder = owner.Evaluate(rawSpell.Mod.ManaAdder ?? "0");
+        float manaMultiplier = owner.Evaluate(rawSpell.Mod.ManaMultiplier ?? "1");
 
         return Mathf.RoundToInt((manaCost + manaAdder) * manaMultiplier);
     }
 
     public float GetBaseDamage()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float damage = RPN.eval(rawSpell.Damage?.Amount ?? "0", ctx);
-        float damageAdder = RPN.eval(rawSpell.Mod.DamageAdder ?? "0", ctx);
-        float damageMultiplier= RPN.eval(rawSpell.Mod.DamageMultiplier ?? "1", ctx);
+        float damage = owner.Evaluate(rawSpell.Damage?.Amount ?? "0");
+        float damageAdder = owner.Evaluate(rawSpell.Mod.DamageAdder ?? "0");
+        float damageMultiplier= owner.Evaluate(rawSpell.Mod.DamageMultiplier ?? "1");
 
         return (damage + damageAdder) * damageMultiplier;
     }
 
     public float GetSecondaryDamage()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.SecondaryDamage ?? "0", ctx);
+        return owner.Evaluate(rawSpell.SecondaryDamage ?? "0");
     }
 
     public float GetCooldown()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float cooldown = RPN.eval(rawSpell.Cooldown ?? "0", ctx);
-        float cooldownAdder = RPN.eval(rawSpell.Mod.CooldownAdder ?? "0", ctx);
-        float cooldownMultiplier = RPN.eval(rawSpell.Mod.CooldownMultiplier ?? "1", ctx);
+        float cooldown = owner.Evaluate(rawSpell.Cooldown ?? "0");
+        float cooldownAdder = owner.Evaluate(rawSpell.Mod.CooldownAdder ?? "0");
+        float cooldownMultiplier = owner.Evaluate(rawSpell.Mod.CooldownMultiplier ?? "1");
 
         return (cooldown + cooldownAdder) * cooldownMultiplier;
     }
 
     public float GetBaseProjectileSpeed()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float speed = RPN.eval(rawSpell.Projectile?.Speed ?? "0", ctx);
-        float speedAdder = RPN.eval(rawSpell.Mod.SpeedAdder ?? "0", ctx);
-        float speedMultiplier = RPN.eval(rawSpell.Mod.SpeedMultiplier ?? "1", ctx);
+        float speed = owner.Evaluate(rawSpell.Projectile?.Speed ?? "0");
+        float speedAdder = owner.Evaluate(rawSpell.Mod.SpeedAdder ?? "0");
+        float speedMultiplier = owner.Evaluate(rawSpell.Mod.SpeedMultiplier ?? "1");
 
         return (speed + speedAdder) * speedMultiplier;
     }
 
     public float GetSecondaryProjectileSpeed()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float speed = RPN.eval(rawSpell.SecondaryProjectile?.Speed ?? "0", ctx);
-        float speedAdder = RPN.eval(rawSpell.Mod.SpeedAdder ?? "0", ctx);
-        float speedMultiplier = RPN.eval(rawSpell.Mod.SpeedMultiplier ?? "1", ctx);
+        float speed = owner.Evaluate(rawSpell.SecondaryProjectile?.Speed ?? "0");
+        float speedAdder = owner.Evaluate(rawSpell.Mod.SpeedAdder ?? "0");
+        float speedMultiplier = owner.Evaluate(rawSpell.Mod.SpeedMultiplier ?? "1");
 
         return (speed + speedAdder) * speedMultiplier;
     }
@@ -182,8 +158,6 @@ public class Spell
     public IEnumerator Cast(Vector3 where, Vector3 target, Hittable.Team team)
     {
         lastCast = Time.time;
-        var ctx = owner.GetContext().ToDictionary();
-
         Vector3 dir = (target - where).normalized;
 
         FireBaseProjectiles(where, dir);

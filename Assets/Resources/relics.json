@@ -23,7 +23,7 @@
         "effect": {
             "description": "you gain 10 spellpower (+5/wave)",
             "type": "gain-spellpower",
-            "amount": "10 wave 5 * +",
+            "amount": "10 + wave * 5",
             "until": "move"
         }
     },
@@ -157,7 +157,7 @@
         "effect": {
             "description": "Your max healthly will increase",
             "type": "gain-healthly",
-            "amount": "10 wave 5 * +"
+            "amount": "10 + wave * 5"
         }
     }
 ]
