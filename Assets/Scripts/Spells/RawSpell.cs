@@ -4,122 +4,134 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-public struct RawSpell
+public struct AttrDamage
 {
-    public struct RawDamage
-    {
-        [JsonProperty("amount")]
-        public string Amount { get; set; }
-        [JsonProperty("type")]
-        public string Type { get; set; }
-    }
+    public string Amount { get; set; }
+    public string Type { get; set; }
+}
 
-    public struct RawProjectile
-    {
-        [JsonProperty("trajectory")]
-        public string Trajectory { get; set; }
-        [JsonProperty("speed")]
-        public string Speed { get; set; }
-        [JsonProperty("sprite")]
-        public int Sprite { get; set; }
-        [JsonProperty("lifetime")]
-        public string Lifetime { get; set; }
-    }
+public struct AttrProjectile
+{
+    public string Trajectory { get; set; }
+    public string Speed { get; set; }
+    public int Sprite { get; set; }
+    public string? Lifetime { get; set; }
+}
 
-    // Base stuff
-    [JsonProperty("name")]
-    public string Name { get; set; }
-    [JsonProperty("description")]
-    public string Description { get; set; }
-    [JsonProperty("mana_cost")]
-    public string ManaCost { get; set; }
-    [JsonProperty("damage")]
-    public RawDamage? Damage { get; set; }
-    [JsonProperty("secondary_damage")]
+public class BaseSpell
+{
+    public string Name { get; set; } = "Unknown";
+    public string Description { get; set; } = "Missing description.";
+
+    public string ManaCost { get; set; } = "0";
+    public AttrDamage? Damage { get; set; }
     public string? SecondaryDamage { get; set; }
-    [JsonProperty("cooldown")]
     public string? Cooldown { get; set; }
-    [JsonProperty("icon")]
     public int Icon { get; set; }
-    [JsonProperty("count")]
     public string? Count { get; set; }
-    [JsonProperty("spray")]
     public string? Spray { get; set; }
-    [JsonProperty("projectile")]
-    public RawProjectile? Projectile { get; set; }
-    [JsonProperty("secondary_projectile")]
-    public RawProjectile? SecondaryProjectile { get; set; }
+    public AttrProjectile? Projectile { get; set; }
+    public AttrProjectile? SecondaryProjectile { get; set; }
 
-    // Modifier stuff
-    [JsonProperty("modifier")]
-    public bool? Modifier { get; set; }
-    [JsonProperty("double_projectile")]
+    public BaseSpell() { }
+
+    public BaseSpell(BaseSpell other)
+    {
+        Name = other.Name;
+        Description = other.Description;
+        ManaCost = other.ManaCost;
+        Damage = other.Damage;
+        SecondaryDamage = other.SecondaryDamage;
+        Cooldown = other.Cooldown;
+        Icon = other.Icon;
+        Count = other.Count;
+        Spray = other.Spray;
+        Projectile = other.Projectile;
+        SecondaryProjectile = other.SecondaryProjectile;
+    }
+}
+
+public class ModifierSpell
+{
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+
+    public bool Modifier { get; set; }
     public bool? DoubleProjectile { get; set; }
-    [JsonProperty("split_projectile")]
     public bool? SplitProjectile { get; set; }
-    [JsonProperty("projectile_trajectory")]
     public string? ProjectileTrajectory { get; set; }
 
-    [JsonProperty("damage_adder")]
     public string? DamageAdder { get; set; }
-    [JsonProperty("speed_adder")]
     public string? SpeedAdder { get; set; }
-    [JsonProperty("mana_adder")]
     public string? ManaAdder { get; set; }
-    [JsonProperty("cooldown_adder")]
     public string? CooldownAdder { get; set; }
 
-    [JsonProperty("damage_multiplier")]
     public string? DamageMultiplier { get; set; }
-    [JsonProperty("speed_multiplier")]
     public string? SpeedMultiplier { get; set; }
-    [JsonProperty("mana_multiplier")]
     public string? ManaMultiplier { get; set; }
-    [JsonProperty("cooldown_multiplier")]
     public string? CooldownMultiplier { get; set; }
 
-    [JsonProperty("delay")]
     public string? Delay { get; set; }
-    [JsonProperty("angle")]
     public string? Angle { get; set; }
 
-    /// Combine two spells.
-    /// Used to apply modifier spells to base spells.
-    public RawSpell WithModifierSpell(RawSpell modifierSpell)
+    public void Modify(ModifierSpell other)
     {
-        var rs = new RawSpell();
+        if (!other.Modifier) return;
+        Modifier = true;
 
-        // TODO: Fix this whole thing somehow, combine spells better.
+        DoubleProjectile = other.DoubleProjectile ?? DoubleProjectile;
+        SplitProjectile = other.SplitProjectile ?? SplitProjectile;
+        ProjectileTrajectory = other.ProjectileTrajectory ?? ProjectileTrajectory;
 
-        // Base spell elements
-        rs.Name = $"{Name} ({modifierSpell.Name})";
-        rs.Description = Description;
-        rs.ManaCost = ManaCost;
-        rs.Damage = Damage;
-        rs.SecondaryDamage = SecondaryDamage;
-        rs.Cooldown = Cooldown;
-        rs.Icon = Icon;
-        rs.Count = Count;
-        rs.Projectile = Projectile;
-        rs.SecondaryProjectile = SecondaryProjectile;
+        DamageAdder = other.DamageAdder ?? DamageAdder;
+        SpeedAdder = other.SpeedAdder ?? SpeedAdder;
+        ManaAdder = other.ManaAdder ?? ManaAdder;
+        CooldownAdder = other.CooldownAdder ?? CooldownAdder;
 
-        // Modifier stuff
-        rs.DoubleProjectile = modifierSpell.DoubleProjectile;
-        rs.SplitProjectile = modifierSpell.SplitProjectile;
-        rs.ProjectileTrajectory = modifierSpell.ProjectileTrajectory;
-        rs.DamageAdder = modifierSpell.DamageAdder;
-        rs.SpeedAdder = modifierSpell.SpeedAdder;
-        rs.ManaAdder = modifierSpell.ManaAdder;
-        rs.CooldownAdder = modifierSpell.CooldownAdder;
-        rs.DamageMultiplier = modifierSpell.DamageMultiplier;
-        rs.SpeedMultiplier = modifierSpell.SpeedMultiplier;
-        rs.ManaMultiplier = modifierSpell.ManaMultiplier;
-        rs.CooldownMultiplier = modifierSpell.CooldownMultiplier;
-        rs.Delay = modifierSpell.Delay;
-        rs.Angle = modifierSpell.Angle;
+        DamageMultiplier = other.DamageMultiplier ?? DamageMultiplier;
+        SpeedMultiplier = other.SpeedMultiplier ?? SpeedMultiplier;
+        ManaMultiplier = other.ManaMultiplier ?? ManaMultiplier;
+        CooldownMultiplier = other.CooldownMultiplier ?? CooldownMultiplier;
 
-        Debug.Log(JsonConvert.SerializeObject(rs, Formatting.Indented));
+        Delay = other.Delay ?? Delay;
+        Angle = other.Angle ?? Angle;
 
-        return rs;
+        if (other.Name != "")
+            Name = Name == "" ? other.Name : $"{other.Name} {Name}";
+
+        if (other.Description != "")
+            Description = Description == "" ? other.Description : $"{Description}\n{other.Description}";
+    }
+}
+
+public class RawSpell : BaseSpell
+{
+    public ModifierSpell Mod;
+
+    public RawSpell(BaseSpell baseSpell, ModifierSpell? mod = null) : base(baseSpell) {
+        Mod = mod ?? new ModifierSpell();
+    }
+
+    public string GetName()
+    {
+        return Mod.Name == "" ? Name : $"{Mod.Name} {Name}";
+    }
+
+    public string GetDescription()
+    {
+        return Mod.Description == "" ? Description : $"{Description}\n{Mod.Description}";
+    }
+
+    public static RawSpell? CraftSpell(RawSpell modifierSpell, RawSpell baseSpell)
+    {
+        if (!modifierSpell.Mod.Modifier)
+        {
+            if (!baseSpell.Mod.Modifier) return null;
+            (modifierSpell, baseSpell) = (baseSpell, modifierSpell);
+        }
+
+        RawSpell craftedSpell = (RawSpell)baseSpell.MemberwiseClone();
+        craftedSpell.Mod = modifierSpell.Mod;
+        return craftedSpell;
     }
 }

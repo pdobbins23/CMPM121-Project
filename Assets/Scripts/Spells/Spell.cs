@@ -29,14 +29,14 @@ public class Spell
     {
         var ctx = owner.GetContext().ToDictionary();
 
-        return RPN.eval(rawSpell.Delay ?? "0", ctx);
+        return RPN.eval(rawSpell.Mod.Delay ?? "0", ctx);
     }
 
     public float GetAngle()
     {
         var ctx = owner.GetContext().ToDictionary();
 
-        return RPN.eval(rawSpell.Angle ?? "0", ctx);
+        return RPN.eval(rawSpell.Mod.Angle ?? "0", ctx);
     }
 
     public int GetCount()
@@ -72,8 +72,8 @@ public class Spell
         var ctx = owner.GetContext().ToDictionary();
 
         float manaCost = RPN.eval(rawSpell.ManaCost, ctx);
-        float manaAdder = RPN.eval(rawSpell.ManaAdder ?? "0", ctx);
-        float manaMultiplier = RPN.eval(rawSpell.ManaMultiplier ?? "1", ctx);
+        float manaAdder = RPN.eval(rawSpell.Mod.ManaAdder ?? "0", ctx);
+        float manaMultiplier = RPN.eval(rawSpell.Mod.ManaMultiplier ?? "1", ctx);
 
         return Mathf.RoundToInt((manaCost + manaAdder) * manaMultiplier);
     }
@@ -83,8 +83,8 @@ public class Spell
         var ctx = owner.GetContext().ToDictionary();
 
         float damage = RPN.eval(rawSpell.Damage?.Amount ?? "0", ctx);
-        float damageAdder = RPN.eval(rawSpell.DamageAdder ?? "0", ctx);
-        float damageMultiplier= RPN.eval(rawSpell.DamageMultiplier ?? "1", ctx);
+        float damageAdder = RPN.eval(rawSpell.Mod.DamageAdder ?? "0", ctx);
+        float damageMultiplier= RPN.eval(rawSpell.Mod.DamageMultiplier ?? "1", ctx);
 
         return (damage + damageAdder) * damageMultiplier;
     }
@@ -101,8 +101,8 @@ public class Spell
         var ctx = owner.GetContext().ToDictionary();
 
         float cooldown = RPN.eval(rawSpell.Cooldown ?? "0", ctx);
-        float cooldownAdder = RPN.eval(rawSpell.CooldownAdder ?? "0", ctx);
-        float cooldownMultiplier = RPN.eval(rawSpell.CooldownMultiplier ?? "1", ctx);
+        float cooldownAdder = RPN.eval(rawSpell.Mod.CooldownAdder ?? "0", ctx);
+        float cooldownMultiplier = RPN.eval(rawSpell.Mod.CooldownMultiplier ?? "1", ctx);
 
         return (cooldown + cooldownAdder) * cooldownMultiplier;
     }
@@ -112,8 +112,8 @@ public class Spell
         var ctx = owner.GetContext().ToDictionary();
 
         float speed = RPN.eval(rawSpell.Projectile?.Speed ?? "0", ctx);
-        float speedAdder = RPN.eval(rawSpell.SpeedAdder ?? "0", ctx);
-        float speedMultiplier = RPN.eval(rawSpell.SpeedMultiplier ?? "1", ctx);
+        float speedAdder = RPN.eval(rawSpell.Mod.SpeedAdder ?? "0", ctx);
+        float speedMultiplier = RPN.eval(rawSpell.Mod.SpeedMultiplier ?? "1", ctx);
 
         return (speed + speedAdder) * speedMultiplier;
     }
@@ -123,15 +123,15 @@ public class Spell
         var ctx = owner.GetContext().ToDictionary();
 
         float speed = RPN.eval(rawSpell.SecondaryProjectile?.Speed ?? "0", ctx);
-        float speedAdder = RPN.eval(rawSpell.SpeedAdder ?? "0", ctx);
-        float speedMultiplier = RPN.eval(rawSpell.SpeedMultiplier ?? "1", ctx);
+        float speedAdder = RPN.eval(rawSpell.Mod.SpeedAdder ?? "0", ctx);
+        float speedMultiplier = RPN.eval(rawSpell.Mod.SpeedMultiplier ?? "1", ctx);
 
         return (speed + speedAdder) * speedMultiplier;
     }
 
     private void FireProjectile(Vector3 where, Vector3 dir)
     {
-        string baseTrajectory = rawSpell.ProjectileTrajectory ?? rawSpell.Projectile?.Trajectory;
+        string baseTrajectory = rawSpell.Mod.ProjectileTrajectory ?? rawSpell.Projectile?.Trajectory;
 
         GameManager.Instance.projectileManager.CreateProjectile(
             rawSpell.Icon, baseTrajectory, where, dir, GetBaseProjectileSpeed(), OnHit, GetBaseLifetime());
@@ -154,7 +154,7 @@ public class Spell
                 finalDir = rot * finalDir;
             }
 
-            if (rawSpell.SplitProjectile == true)
+            if (rawSpell.Mod.SplitProjectile == true)
             {
                 float angleOffset = GetAngle();
                 Quaternion rotation1 = Quaternion.Euler(0, 0, angleOffset);
@@ -187,7 +187,7 @@ public class Spell
 
         FireBaseProjectiles(where, dir);
 
-        if (rawSpell.DoubleProjectile == true)
+        if (rawSpell.Mod.DoubleProjectile == true)
         {
             yield return new WaitForSeconds(GetDelay());
 

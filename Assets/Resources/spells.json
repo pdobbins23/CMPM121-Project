@@ -3,31 +3,31 @@
         "name": "Arcane Bolt",
         "description": "A straight-flying bolt.",
         "icon": 0,
-        "damage": {"amount": "25 power 5 / +", "type": "arcane"},
+        "damage": { "amount": "25 power 5 / +", "type": "arcane" },
         "mana_cost": "10",
         "cooldown": "2",
-        "projectile": {"trajectory": "straight", "speed": "8 power 5 / +", "sprite": 0}
+        "projectile": { "trajectory": "straight", "speed": "8 power 5 / +", "sprite": 0}
     },
     "magic_missile":  {
         "name": "Magic Missile",
         "description": "A homing bolt.",
         "icon": 2,
-        "damage": {"amount": "10 power 3 / +", "type": "arcane"},
+        "damage": { "amount": "10 power 3 / +", "type": "arcane" },
         "mana_cost": "20",
         "cooldown": "3",
-        "projectile": {"trajectory": "homing", "speed": "10", "sprite": 0}
+        "projectile": { "trajectory": "homing", "speed": "10", "sprite": 0}
     },
     "arcane_blast":  {
         "name": "Arcane Blast",
         "description": "A bolt that explodes into smaller bolts on impact.",
         "icon": 2,
         "count": "8 power 5 / +",
-        "damage": {"amount": "20 power 3 / +", "type": "arcane"},
+        "damage": { "amount": "20 power 3 / +", "type": "arcane" },
         "secondary_damage": "5 power 10 / +",
         "mana_cost": "15 power 5 / +",
         "cooldown": "1.5",
-        "projectile": {"trajectory": "straight", "speed": "12", "sprite": 0},
-        "secondary_projectile": {"trajectory": "straight", "speed": "20", "lifetime": "0.1", "sprite": 0}
+        "projectile": { "trajectory": "straight", "speed": "12", "sprite": 0},
+        "secondary_projectile": { "trajectory": "straight", "speed": "20", "lifetime": "0.1", "sprite": 0}
     },
     "arcane_spray":  {
         "name": "Arcane Spray",
@@ -35,10 +35,10 @@
         "icon": 1,
         "count": "7 power 25 / +",
         "spray": "0.3",
-        "damage": {"amount": "3 power 5 / +", "type": "arcane"},
+        "damage": { "amount": "3 power 5 / +", "type": "arcane" },
         "mana_cost": "15",
         "cooldown": "0.5",
-        "projectile": {"trajectory": "straight", "speed": "8", "sprite": 0, "lifetime": "0.1 power 100 / +"}
+        "projectile": { "trajectory": "straight", "speed": "8", "sprite": 0, "lifetime": "0.1 power 100 / +" }
     },
     "knockback_blast": {
         "name": "Knockback Blast",
@@ -47,16 +47,16 @@
         "damage": { "amount": "30 power 2 * +", "type": "arcane" },
         "mana_cost": "25 power 1 +",
         "cooldown": "2.0",
-        "projectile": {"trajectory": "straight", "speed": "14", "sprite": 2, "lifetime": "0.25"}
+        "projectile": { "trajectory": "straight", "speed": "14", "sprite": 2, "lifetime": "0.25" }
     },
     "arcane_wave_bolt":  {
         "name": "Arcane Wave Bolt",
         "description": "A straight-wave bolt.",
         "icon": 0,
-        "damage": {"amount": "25 power 10 / +", "type": "arcane"},
+        "damage": { "amount": "25 power 10 / +", "type": "arcane" },
         "mana_cost": "14",
         "cooldown": "2",
-        "projectile": {"trajectory": "wave", "speed": "2.3", "sprite": 0}
+        "projectile": { "trajectory": "wave", "speed": "2.3", "sprite": 0}
     },
 
     "waver": {
@@ -77,7 +77,7 @@
     "speed_amp": {
         "name": "speed-amplified",
         "modifier": true,
-        "description": "Faster projectile speed",
+        "description": "Faster projectile speed.",
         "speed_multiplier": "1.75"
     },
     "doubler": {
