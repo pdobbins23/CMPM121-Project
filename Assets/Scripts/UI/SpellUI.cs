@@ -46,13 +46,13 @@ public class SpellUI : MonoBehaviour
         float since_last = Time.time - spell.LastCast();
         
         float perc;
-        if (since_last > spell.GetCoolDown())
+        if (since_last > spell.GetCooldown())
         {
             perc = 0;
         }
         else
         {
-            perc = 1-since_last / spell.GetCoolDown();
+            perc = 1-since_last / spell.GetCooldown();
         }
         
         cooldown.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 48 * perc);

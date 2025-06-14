@@ -38,7 +38,7 @@ public class SpellRewardUI : MonoBehaviour
         spellNameText.text = rewardSpell.GetName();
         spellDescText.text = $"Mana: {rewardSpell.GetManaCost()}\n" +
                              $"Damage: {rewardSpell.GetBaseDamage()}\n" +
-                             $"Cooldown: {rewardSpell.GetCoolDown()}";
+                             $"Cooldown: {rewardSpell.GetCooldown()}";
 
         GameManager.Instance.spellIconManager.PlaceSprite(rewardSpell.GetIcon(), iconImage);
 

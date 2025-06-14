@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 public struct RawSpell
 {
-    public struct Damage
+    public struct RawDamage
     {
         [JsonProperty("amount")]
         public string Amount { get; set; }
@@ -14,7 +14,7 @@ public struct RawSpell
         public string Type { get; set; }
     }
 
-    public struct Projectile
+    public struct RawProjectile
     {
         [JsonProperty("trajectory")]
         public string Trajectory { get; set; }
@@ -23,7 +23,7 @@ public struct RawSpell
         [JsonProperty("sprite")]
         public int Sprite { get; set; }
         [JsonProperty("lifetime")]
-        public string LifeTime { get; set; } ////////////////
+        public string Lifetime { get; set; }
     }
 
     // Base stuff
@@ -34,11 +34,11 @@ public struct RawSpell
     [JsonProperty("mana_cost")]
     public string ManaCost { get; set; }
     [JsonProperty("damage")]
-    public Damage? BaseDamage { get; set; } ////////////////
+    public RawDamage? Damage { get; set; }
     [JsonProperty("secondary_damage")]
     public string? SecondaryDamage { get; set; }
     [JsonProperty("cooldown")]
-    public string? CoolDown { get; set; } ////////////////
+    public string? Cooldown { get; set; }
     [JsonProperty("icon")]
     public int Icon { get; set; }
     [JsonProperty("count")]
@@ -46,9 +46,9 @@ public struct RawSpell
     [JsonProperty("spray")]
     public string? Spray { get; set; }
     [JsonProperty("projectile")]
-    public Projectile? BaseProjectile { get; set; } ////////////////
+    public RawProjectile? Projectile { get; set; }
     [JsonProperty("secondary_projectile")]
-    public Projectile? SecondaryProjectile { get; set; }
+    public RawProjectile? SecondaryProjectile { get; set; }
 
     // Modifier stuff
     [JsonProperty("modifier")]
@@ -67,7 +67,7 @@ public struct RawSpell
     [JsonProperty("mana_adder")]
     public string? ManaAdder { get; set; }
     [JsonProperty("cooldown_adder")]
-    public string? CoolDownAdder { get; set; }
+    public string? CooldownAdder { get; set; }
 
     [JsonProperty("damage_multiplier")]
     public string? DamageMultiplier { get; set; }
@@ -76,7 +76,7 @@ public struct RawSpell
     [JsonProperty("mana_multiplier")]
     public string? ManaMultiplier { get; set; }
     [JsonProperty("cooldown_multiplier")]
-    public string? CoolDownMultiplier { get; set; }
+    public string? CooldownMultiplier { get; set; }
 
     [JsonProperty("delay")]
     public string? Delay { get; set; }
@@ -95,12 +95,12 @@ public struct RawSpell
         rs.Name = $"{Name} ({modifierSpell.Name})";
         rs.Description = Description;
         rs.ManaCost = ManaCost;
-        rs.BaseDamage = BaseDamage;
+        rs.Damage = Damage;
         rs.SecondaryDamage = SecondaryDamage;
-        rs.CoolDown = CoolDown;
+        rs.Cooldown = Cooldown;
         rs.Icon = Icon;
         rs.Count = Count;
-        rs.BaseProjectile = BaseProjectile;
+        rs.Projectile = Projectile;
         rs.SecondaryProjectile = SecondaryProjectile;
 
         // Modifier stuff
@@ -110,11 +110,11 @@ public struct RawSpell
         rs.DamageAdder = modifierSpell.DamageAdder;
         rs.SpeedAdder = modifierSpell.SpeedAdder;
         rs.ManaAdder = modifierSpell.ManaAdder;
-        rs.CoolDownAdder = modifierSpell.CoolDownAdder;
+        rs.CooldownAdder = modifierSpell.CooldownAdder;
         rs.DamageMultiplier = modifierSpell.DamageMultiplier;
         rs.SpeedMultiplier = modifierSpell.SpeedMultiplier;
         rs.ManaMultiplier = modifierSpell.ManaMultiplier;
-        rs.CoolDownMultiplier = modifierSpell.CoolDownMultiplier;
+        rs.CooldownMultiplier = modifierSpell.CooldownMultiplier;
         rs.Delay = modifierSpell.Delay;
         rs.Angle = modifierSpell.Angle;
 

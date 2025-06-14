@@ -234,7 +234,7 @@ public class ItemBlock : MultiBlock
         {
             Sprite sprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()]);
             float sinceLast = Time.time - spell.LastCast();
-            float ratioLeft = sinceLast > spell.GetCoolDown() ? 0 : 1 - sinceLast / spell.GetCoolDown();
+            float ratioLeft = sinceLast > spell.GetCooldown() ? 0 : 1 - sinceLast / spell.GetCooldown();
 
             Add(new ImageBlock(sprite)).Center(0, 0, 48 * s, 48 * s);
             Add(new RectBlock(0x888888, 0.5f)).Center((-24 + 24 * ratioLeft) * s, 0, 48 * ratioLeft * s, 48 * s);
