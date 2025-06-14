@@ -8,21 +8,10 @@ using System.Linq;
 
 public class Game : MonoBehaviour
 {
-    private static Game? s_instance;
-
-    public static Game Get()
-    {
-        if (s_instance == null) throw new InvalidOperationException("Game not yet ready");
-        return s_instance;
-    }
-
     public Interface? ui = null!;
 
     void Awake()
     {
-        if (s_instance != null) throw new InvalidOperationException("Cannot initialize Game multiple times");
-        s_instance = this;
-
         ui = new Interface();
     }
 
@@ -37,6 +26,8 @@ public class Game : MonoBehaviour
 public class Interface
 {
     public WaveManager wm;
+
+    public string? home_overlay = "home";
 
     public string? class_;
     public string? level;
@@ -65,6 +56,7 @@ public class InterfaceBlock : MultiBlock
     private ClassMenuBlock? _classMenu;
     private LevelMenuBlock? _levelMenu;
     private RewardMenuBlock? _rewardMenu;
+    private HomeBlock? _home;
 
     public InterfaceBlock(Interface ui)
     {
@@ -113,6 +105,17 @@ public class InterfaceBlock : MultiBlock
             _levelMenu = null;
 
             _ui.wm.StartLevel(_ui.level);
+        }
+
+        if (_home == null && _ui.home_overlay != null)
+        {
+            _home = new HomeBlock(_ui);
+            Add(_home).Center(0, 0, 1200, 700);
+        }
+        else if (_home != null && _ui.home_overlay == null)
+        {
+            GameObject.Destroy(_home.go);
+            _home = null;
         }
 
         if (_rewardMenu == null && GameManager.Instance.state == GameManager.GameState.ENDINGWAVE)
@@ -441,19 +444,28 @@ public class CraftingMenuBlock : MultiBlock
         _item_a_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
             _craft_btn.go.SetActive(false);
             _item_a_rmbtn.go.SetActive(false);
-            // TODO: Actually reset the thing
+            Refresh();
         })).Center(-200, 180, 100, 32);
         _item_a_rmbtn.go.SetActive(false);
 
         _item_b_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
             _craft_btn.go.SetActive(false);
             _item_b_rmbtn.go.SetActive(false);
-            // TODO: Actually reset the thing
+            Refresh();
         })).Center(200, 180, 100, 32);
         _item_b_rmbtn.go.SetActive(false);
 
         _craft_btn = Add(new ButtonBlock("Craft", (obj) => {
+            if (_item_a.spell == null || _item_b.spell == null) return;
 
+            var crafted = RawSpell.CraftSpell(_item_a.spell.GetRaw(), _item_b.spell.GetRaw());
+
+            var pc = GameManager.Instance.player.GetComponent<PlayerController>();
+            pc.spellcaster.spells.Remove(_item_a.spell);
+            pc.spellcaster.spells.Remove(_item_b.spell);
+            pc.spellcaster.spells.Add(new Spell(crafted, pc.spellcaster));
+
+            go.SetActive(false);
         })).Center(0, -150, 200, 50);
         _craft_btn.go.SetActive(false);
 
@@ -538,6 +550,57 @@ public class CraftingMenuBlock : MultiBlock
             _item_b.icon = new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"));
 
             Add(_item_b.icon).Center(200, 0, 200, 200);
+        }
+    }
+}
+
+public class HomeBlock : MultiBlock
+{
+    private readonly Interface _ui;
+
+    public HomeBlock(Interface ui)
+    {
+        _ui = ui;
+        Refresh();
+    }
+
+    public void Refresh() {
+        Clear();
+
+        Add(new RectBlock(0x876542)).Center(0, 0, 15360, 8640);
+        Add(new PanelBlock()).Center(0, 0, 1200, 700);
+
+        switch (_ui.home_overlay)
+        {
+            case "home":
+                Add(new TextBlock("Fang & Fur", 0x7a4e1c)).Center(0, 160, 600, 100);
+                Add(new ButtonBlock("Play", _ => _ui.home_overlay = null).Center(0, 0, 200, 50));
+                Add(new ButtonBlock("Credits", _ => { _ui.home_overlay = "credits"; Refresh(); }).Center(0, -80, 200, 50));
+                Add(new ButtonBlock("Options", _ => { _ui.home_overlay = "options"; Refresh(); }).Center(0, -160, 200, 50));
+                break;
+            case "credits":
+                Add(new ButtonBlock("Back", _ => { _ui.home_overlay = "home"; Refresh(); }).At(60, 60, 200, 50));
+                Add(new TextBlock("Credits", 0x7a4e1c)).Center(0, 160, 600, 60);
+                Add(new TextBlock("Peter Dobbins", 0x7a4e1c)).Center(0, -80, 600, 30);
+                Add(new TextBlock("Astra Tsai", 0x7a4e1c)).Center(0, -40, 600, 30);
+                Add(new TextBlock("Seeya Pillai", 0x7a4e1c)).Center(0, 0, 600, 30);
+                Add(new TextBlock("Anson Fong", 0x7a4e1c)).Center(0, 40, 600, 30);
+                Add(new TextBlock("Peichen Yao", 0x7a4e1c)).Center(0, 80, 600, 30);
+                break;
+            case "options":
+                Add(new ButtonBlock("Back", _ => { _ui.home_overlay = "home"; Refresh(); }).At(60, 60, 200, 50));
+
+                var sfx = AudioManager.Instance.sfxSource;
+                var music = AudioManager.Instance.musicSource;
+                Add(new TextBlock($"SFX Volume: {Math.Round(sfx.volume * 100)}%", 0x7a4e1c)).Center(-150, -40, 300, 30);
+                Add(new TextBlock($"Music Volume: {Math.Round(music.volume * 100)}%", 0x7a4e1c)).Center(-150, 40, 300, 30);
+                Add(new ButtonBlock("Mute", _ => { sfx.volume = 0; Refresh(); })).Center(50, -40, 90, 40);
+                Add(new ButtonBlock("Mute", _ => { music.volume = 0; Refresh(); })).Center(50, 40, 90, 40);
+                Add(new ButtonBlock("-", _ => { sfx.volume = Math.Clamp(sfx.volume - 0.1f, 0, 1); Refresh(); })).Center(125, -40, 40, 40);
+                Add(new ButtonBlock("-", _ => { music.volume = Math.Clamp(music.volume - 0.1f, 0, 1); Refresh(); })).Center(125, 40, 40, 40);
+                Add(new ButtonBlock("+", _ => { sfx.volume = Math.Clamp(sfx.volume + 0.1f, 0, 1); Refresh(); })).Center(175, -40, 40, 40);
+                Add(new ButtonBlock("+", _ => { music.volume = Math.Clamp(music.volume + 0.1f, 0, 1); Refresh(); })).Center(175, 40, 40, 40);
+                break;
         }
     }
 }
