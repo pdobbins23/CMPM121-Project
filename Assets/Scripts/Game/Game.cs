@@ -426,6 +426,7 @@ public class LevelMenuBlock : MultiBlock
 public class RewardMenuBlock : MultiBlock
 {
     private readonly CraftingMenuBlock craftingMenu;
+    private readonly DropMenuBlock dropMenu;
 
     private readonly List<ItemSlot> relicItemSlots = new();
 
@@ -436,6 +437,9 @@ public class RewardMenuBlock : MultiBlock
         Add(new ButtonBlock("Craft", (obj) => {
             craftingMenu?.go.SetActive(true);
         })).Center(-350, 300, 160, 64);
+        Add(new ButtonBlock("Drop", (obj) => {
+            dropMenu?.go.SetActive(true);
+        })).Center(350, 300, 160, 64);
 
         Add(new TextBlock("Grab your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
@@ -459,6 +463,8 @@ public class RewardMenuBlock : MultiBlock
 
         craftingMenu = (CraftingMenuBlock)Add(new CraftingMenuBlock(ui)).Center(0, 0, 1000, 800);
         craftingMenu.go.SetActive(false);
+        dropMenu = (DropMenuBlock)Add(new DropMenuBlock(ui)).Center(0, 0, 1000, 800);
+        dropMenu.go.SetActive(false);
     }
 
     public override void Refresh()
@@ -473,9 +479,9 @@ public class RewardMenuBlock : MultiBlock
 public class CraftingMenuBlock : MultiBlock
 {
 
-    private ItemSlot _item_left = new();
-    private ItemSlot _item_right = new();
-    private ItemSlot _item_output = new(null, false);
+    private ItemSlot _slot_left = new();
+    private ItemSlot _slot_right = new();
+    private ItemSlot _slot_output = new(null, false);
 
     private bool _has_crafted;
 
@@ -484,9 +490,11 @@ public class CraftingMenuBlock : MultiBlock
     public CraftingMenuBlock(Interface ui) {
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
-        Add(new ItemBlock(_item_left)).Center(-300, 0, 200, 200);
-        Add(new ItemBlock(_item_right)).Center(-50, 0, 200, 200);
-        Add(new ItemBlock(_item_output)).Center(300, 0, 200, 200);
+        Add(new TextBlock("Craft Spell", 0x333333)).Center(0, 300, 320, 40);
+
+        Add(new ItemBlock(_slot_left)).Center(-300, 0, 200, 200);
+        Add(new ItemBlock(_slot_right)).Center(-50, 0, 200, 200);
+        Add(new ItemBlock(_slot_output)).Center(300, 0, 200, 200);
 
         _close_button = Add(new ButtonBlock("Close", (obj) => {
             go.SetActive(false);
@@ -497,30 +505,55 @@ public class CraftingMenuBlock : MultiBlock
     {
         if (_has_crafted)
         {
-            if (_item_output.Item == null)
+            if (_slot_output.Item == null)
             {
-                _item_left.Item = null;
-                _item_right.Item = null;
+                _slot_left.Item = null;
+                _slot_right.Item = null;
             }
-            if (_item_left.Item == null || _item_right.Item == null)
+            if (_slot_left.Item == null || _slot_right.Item == null)
             {
-                _item_output.Item = null;
+                _slot_output.Item = null;
                 _has_crafted = false;
             }
         }
 
-        if (_item_left.Item?.Spell is Spell a && _item_right.Item?.Spell is Spell b)
+        if (_slot_left.Item?.Spell is Spell a && _slot_right.Item?.Spell is Spell b)
         {
             var crafted = RawSpell.CraftSpell(a.GetRaw(), b.GetRaw());
             if (crafted != null)
             {
                 var pc = GameManager.Instance.player.GetComponent<PlayerController>();
-                _item_output.Item = new Item(new Spell(crafted, pc.spellcaster));
+                _slot_output.Item = new Item(new Spell(crafted, pc.spellcaster));
                 _has_crafted = true;
             }
         }
 
-        _close_button.go.SetActive(_item_left.Item == null && _item_right.Item == null);
+        _close_button.go.SetActive(_slot_left.Item == null && _slot_right.Item == null);
+
+        base.Refresh();
+    }
+}
+
+public class DropMenuBlock : MultiBlock
+{
+
+    private ItemSlot _slot = new();
+
+    public DropMenuBlock(Interface ui) {
+        Add(new PanelBlock()).Center(0, 0, 1000, 800);
+
+        Add(new TextBlock("Drop Item", 0x333333)).Center(0, 300, 320, 40);
+
+        Add(new ItemBlock(_slot)).Center(0, 0, 200, 200);
+
+        Add(new ButtonBlock("Close", (obj) => {
+            go.SetActive(false);
+        })).Center(0, -300, 160, 32);
+    }
+
+    public override void Refresh()
+    {
+        _slot.Item = null;
 
         base.Refresh();
     }
@@ -554,8 +587,9 @@ public class HomeBlock : MultiBlock
             case "home":
                 Add(new TextBlock("Fang & Fur", 0x7a4e1c)).Center(0, 160, 600, 100);
                 Add(new ButtonBlock("Play", _ => _ui.home_overlay = null).Center(0, 0, 200, 50));
-                Add(new ButtonBlock("Credits", _ => { _ui.home_overlay = "credits"; Refresh(); }).Center(0, -80, 200, 50));
-                Add(new ButtonBlock("Options", _ => { _ui.home_overlay = "options"; Refresh(); }).Center(0, -160, 200, 50));
+                Add(new ButtonBlock("Help", _ => { _ui.home_overlay = "help"; Refresh(); }).Center(0, -80, 200, 50));
+                Add(new ButtonBlock("Credits", _ => { _ui.home_overlay = "credits"; Refresh(); }).Center(0, -160, 200, 50));
+                Add(new ButtonBlock("Options", _ => { _ui.home_overlay = "options"; Refresh(); }).Center(0, -240, 200, 50));
                 break;
             case "credits":
                 Add(new ButtonBlock("Back", _ => { _ui.home_overlay = "home"; Refresh(); }).At(60, 60, 200, 50));
@@ -575,6 +609,18 @@ public class HomeBlock : MultiBlock
                 Add(new TextBlock("https://kenney.nl/assets/ui-pack-pixel-adventure", 0x7a4e1c)).Center(250, -40, 600, 20);
                 Add(new TextBlock("https://opengameart.org/content/tiny-creatures", 0x7a4e1c)).Center(250, -80, 600, 20);
                 Add(new TextBlock("https://opengameart.org/content/arcane-magic-effect", 0x7a4e1c)).Center(250, -120, 600, 20);
+
+                break;
+            case "help":
+                Add(new ButtonBlock("Back", _ => { _ui.home_overlay = "home"; Refresh(); }).At(60, 60, 200, 50));
+
+                Add(new TextBlock("Help", 0x7a4e1c)).Center(0, 160, 600, 60);
+                Add(new TextBlock("To move an item, click on it to select it and then on the blank to", 0x7a4e1c)).Center(0, 80, 1000, 30);
+                Add(new TextBlock("to move it to. To craft a spell, put the component spells on the left,", 0x7a4e1c)).Center(0, 40, 1000, 30);
+                Add(new TextBlock("and a spell will be produced on the right. To drop an item, simply", 0x7a4e1c)).Center(0, 0, 1000, 30);
+                Add(new TextBlock("place the item into the drop slot in the drop menu.", 0x7a4e1c)).Center(0, -40, 1000, 30);
+                Add(new TextBlock("Equipments apply if and only if they are in the appropriate equipment slot.", 0x7a4e1c)).Center(0, -80, 1000, 30);
+                Add(new TextBlock("Relics apply if they are in your inventory.", 0x7a4e1c)).Center(0, -120, 1000, 30);
 
                 break;
             case "options":

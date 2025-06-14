@@ -50,7 +50,7 @@ public class WaveManager : MonoBehaviour
         var ev = new Evaluator(new() { { "wave", GameManager.Instance.currentWave } });
 
         pc.hp.max_hp = ev.EvaluateInt(pc.playerClass.health);
-        pc.spellcaster.mana = ev.EvaluateInt(pc.playerClass.mana);
+        pc.spellcaster.max_mana = ev.EvaluateInt(pc.playerClass.mana);
         pc.spellcaster.mana_reg = ev.EvaluateInt(pc.playerClass.mana_regeneration);
         pc.spellcaster.spell_power = ev.EvaluateInt(pc.playerClass.spellpower);
         pc.speed = ev.EvaluateInt(pc.playerClass.speed);
@@ -59,7 +59,7 @@ public class WaveManager : MonoBehaviour
             if (slot.Item?.Equipment is Equipment equipment)
             {
                 pc.hp.max_hp += equipment.max_hp;
-                pc.spellcaster.mana += equipment.mana;
+                pc.spellcaster.max_mana += equipment.max_mana;
                 pc.spellcaster.mana_reg += equipment.mana_reg;
                 pc.spellcaster.spell_power += equipment.spell_power;
                 pc.speed += equipment.speed;

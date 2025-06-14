@@ -10,7 +10,7 @@ public class Equipment
     public readonly int Type;
 
     public int max_hp;
-    public int mana;
+    public int max_mana;
     public int mana_reg;
     public int spell_power;
     public int speed;
@@ -62,7 +62,7 @@ public class Equipment
             switch (Random.Range(0, 5))
             {
                 case 0: max_hp += Random.Range(20, 40); break;
-                case 1: mana += Random.Range(20, 40); break;
+                case 1: max_mana += Random.Range(20, 40); break;
                 case 2: mana_reg += Random.Range(2, 8); break;
                 case 3: spell_power += Random.Range(10, 60); break;
                 case 4: speed += Random.Range(1, 4); break;
@@ -79,7 +79,7 @@ public class Equipment
     {
         var sb = new StringBuilder();
         if (max_hp > 0) sb.AppendLine($"Max HP: +{max_hp}");
-        if (mana > 0) sb.AppendLine($"Mana: +{mana}");
+        if (max_mana > 0) sb.AppendLine($"Max Mana: +{max_mana}");
         if (mana_reg > 0) sb.AppendLine($"Mana Regen: +{mana_reg}");
         if (spell_power > 0) sb.AppendLine($"Spell Power: +{spell_power}");
         if (speed > 0) sb.AppendLine($"Speed: +{speed}");
