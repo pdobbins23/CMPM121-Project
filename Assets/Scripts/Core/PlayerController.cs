@@ -15,8 +15,6 @@ public class PlayerController : MonoBehaviour
     public ManaBar manaui;
 
     public SpellCaster spellcaster;
-    public GameObject[] spellui = new GameObject[4];
-    public GameObject[] dropButtons = new GameObject[4];
 
     public int speed;
 
@@ -86,7 +84,7 @@ public class PlayerController : MonoBehaviour
     void OnMove(InputValue value)
     {
         if (GameManager.Instance.state == GameManager.GameState.PREGAME || GameManager.Instance.state == GameManager.GameState.GAMEOVER) return;
-        unit.movement = value.Get<Vector2>()*speed;
+        unit.movement = value.Get<Vector2>() * speed;
     }
 
     void Die()

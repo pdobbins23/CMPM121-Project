@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class GameManager 
+public class GameManager
 {
     public enum GameState
     {
@@ -20,7 +20,7 @@ public class GameManager
     public int currentWave = 1;
     public int totalEnemiesForWave = 0;
 
-    
+
     private static GameManager theInstance;
     public static GameManager Instance {  get
         {
@@ -31,7 +31,7 @@ public class GameManager
     }
 
     public GameObject player;
-    
+
     public ProjectileManager projectileManager;
     public SpellIconManager spellIconManager;
     public EnemySpriteManager enemySpriteManager;
@@ -44,9 +44,7 @@ public class GameManager
     public event Action OnWaveStart;
     public void StartNextWave() {
         OnWaveStart?.Invoke();
-    // wave logic here...
-}
-
+    }
 
     public void AddEnemy(GameObject enemy)
     {
@@ -71,15 +69,6 @@ public class GameManager
         if (enemies.Count == 1) return enemies[0];
         return enemies.Aggregate((a,b) => (a.transform.position - point).sqrMagnitude < (b.transform.position - point).sqrMagnitude ? a : b);
     }
-
-    void OnWaveCompleted()
-    {
-        // PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
-        
-        // Spell newSpell = new SpellBuilder().GetRandomSpell(pc.spellcaster);
-        // SpellRewardUI.Instance.Show(newSpell, pc.spellcaster);
-    }
-
 
     private GameManager()
     {
