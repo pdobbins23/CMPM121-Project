@@ -143,7 +143,7 @@ public class InterfaceBlock : MultiBlock
                 rewardRelics.Add(eligible[rnd.Next(eligible.Count())]);
             }
 
-            _rewardMenu = new RewardMenuBlock(_ui, rewardSpell, rewardRelics);
+            _rewardMenu = new RewardMenuBlock(_ui, rewardSpell, rewardRelics, new Equipment());
             Add(_rewardMenu).Center(0, 0, 1000, 800);
         }
         else if (_rewardMenu != null && GameManager.Instance.state != GameManager.GameState.ENDINGWAVE)
@@ -162,18 +162,25 @@ public class InventoryBlock : MultiBlock
 
     public override void Refresh()
     {
-        var inventory = GameManager.Instance.player?.GetComponent<PlayerController>()?.Inventory ?? new();
+        var pc = GameManager.Instance.player?.GetComponent<PlayerController>();
+        var inventory = pc?.Inventory ?? new();
         if (_inventory.SequenceEqual(inventory))
         {
             base.Refresh();
             return;
         }
 
+        Clear();
+
         _inventory = inventory.ToList();
 
         for (int i = 0; i < _inventory.Count; i++)
         {
             Add(new ItemBlock(_inventory[i])).At(i * (64 + 8), 0, 64, 64);
+        }
+        for (int i = 0; i < pc!.Equipments.Count; i++)
+        {
+            Add(new ItemBlock(pc.Equipments[2 - i])).At(0, 96 + i * (64 + 8), 64, 64);
         }
     }
 }
@@ -238,7 +245,7 @@ public class ItemBlock : EventBlock
 
         Clear();
         Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 0, 64 * s, 64 * s);
-        Add(new RectBlock(pc.InventorySlot == _slot ? 0xff0000 : 0x000000)).Center(0, 0, 52 * s, 52 * s);
+        Add(new RectBlock(pc.ActiveSlot == _slot ? 0xff0000 : 0x000000)).Center(0, 0, 52 * s, 52 * s);
 
         if (_slot.Item?.Spell is Spell spell)
         {
@@ -259,9 +266,15 @@ public class ItemBlock : EventBlock
 
             Add(new ImageBlock(sprite)).Center(0, 0, 48 * s, 48 * s);
         }
+        else if (_slot.Item?.Equipment is Equipment equipment)
+        {
+            Sprite sprite = Sprites.Get("Sprites/Tiles/ProjectUtumno_full", $"ProjectUtumno_full_{equipment.Sprite}");
+
+            Add(new ImageBlock(sprite)).Center(0, 0, 48 * s, 48 * s);
+        }
         else
         {
-            Add(new RectBlock(_slot.TakeOnly ? 0xc2bbae : 0xfff1d2)).Center(0, 0, 46 * s, 46 * s);
+            Add(new RectBlock(_slot.AllowPut ? 0xfff1d2 : 0xc2bbae)).Center(0, 0, 46 * s, 46 * s);
         }
 
         if (_slot.Item != null && hovered)
@@ -288,16 +301,16 @@ public class ItemBlock : EventBlock
     public override void OnPointerClick(PointerEventData ev)
     {
         var pc = GameManager.Instance.player.GetComponent<PlayerController>();
-        if (pc.InventorySlot == _slot)
-            pc.InventorySlot = new ItemSlot(null, true);
-        else if (pc.InventorySlot.Item != null && (_slot.Item == null && !_slot.TakeOnly))
+        if (pc.ActiveSlot == _slot)
+            pc.ActiveSlot = new ItemSlot(null, false);
+        else if (pc.ActiveSlot.Item != null && (_slot.Item == null && _slot.CanPut(pc.ActiveSlot.Item)))
         {
-            _slot.Item = pc.InventorySlot.Item;
-            pc.InventorySlot.Item = null;
-            pc.InventorySlot = new ItemSlot(null, true);
+            _slot.Item = pc.ActiveSlot.Item;
+            pc.ActiveSlot.Item = null;
+            pc.ActiveSlot = new ItemSlot(null, false);
         }
         else
-            pc.InventorySlot = _slot;
+            pc.ActiveSlot = _slot;
     }
 }
 
@@ -331,6 +344,11 @@ public class TooltipBlock : EventBlock
         {
             Add(new TextBlock(relic.GetName(), 0xffffff, height * 0.1f)).At(0, height * 0.65f, width, height * 0.35f);
             Add(new TextBlock(relic.GetDescription(), 0xffffff, height * 0.07f)).At(0, 0, width, height * 0.7f);
+        }
+        else if (_slot.Item?.Equipment is Equipment equipment)
+        {
+            Add(new TextBlock(equipment.GetName(), 0xffffff, height * 0.1f)).At(0, height * 0.65f, width, height * 0.35f);
+            Add(new TextBlock(equipment.GetDescription(), 0xffffff, height * 0.07f)).At(0, 0, width, height * 0.7f);
         }
 
         return base.Sized(width, height);
@@ -411,7 +429,7 @@ public class RewardMenuBlock : MultiBlock
 
     private readonly List<ItemSlot> relicItemSlots = new();
 
-    public RewardMenuBlock(Interface ui, Spell rewardSpell, List<Relic> rewardRelics)
+    public RewardMenuBlock(Interface ui, Spell rewardSpell, List<Relic> rewardRelics, Equipment rewardEquipment)
     {
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
@@ -421,16 +439,19 @@ public class RewardMenuBlock : MultiBlock
 
         Add(new TextBlock("Grab your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
-        Add(new ItemBlock(new ItemSlot(new Item(rewardSpell), true))).Center(0, 175, 200, 200);
+        Add(new ItemBlock(new ItemSlot(new Item(rewardSpell), false))).Center(0, 175, 200, 200);
         Add(new TextBlock(rewardSpell.GetName(), 0x333333)).Center(0, 50, 750, 32);
 
         for (int i = 0; i < rewardRelics.Count; i++) {
             var rewardRelic = rewardRelics[i];
-            var slot = new ItemSlot(new Item(rewardRelic), true);
+            var slot = new ItemSlot(new Item(rewardRelic), false);
             relicItemSlots.Add(slot);
-            Add(new ItemBlock(slot)).Center(250 * (i - 1), -100, 100, 100);
-            Add(new TextBlock(rewardRelic.GetName(), 0x333333)).Center(250 * (i - 1), -190, 300, 32);
+            Add(new ItemBlock(slot)).Center(200 * (i - 1.5f), -100, 100, 100);
+            Add(new TextBlock(rewardRelic.GetName(), 0x333333)).Center(200 * (i - 1.5f), -190, 300, 32);
         }
+
+        Add(new ItemBlock(new ItemSlot(new Item(rewardEquipment), false))).Center(200 * 1.5f, -100, 100, 100);
+        Add(new TextBlock(rewardEquipment.GetName(), 0x333333)).Center(200 * 1.5f, -190, 300, 32);
 
         Add(new ButtonBlock("Continue", (obj) =>
             GameManager.Instance.state = GameManager.GameState.WAVEEND
@@ -454,7 +475,7 @@ public class CraftingMenuBlock : MultiBlock
 
     private ItemSlot _item_left = new();
     private ItemSlot _item_right = new();
-    private ItemSlot _item_output = new(null, true);
+    private ItemSlot _item_output = new(null, false);
 
     private bool _has_crafted;
 

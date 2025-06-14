@@ -47,19 +47,25 @@ public class WaveManager : MonoBehaviour
     {
         var pc = GameManager.Instance.player.GetComponent<PlayerController>();
 
-        // pc.hp.hp = pc.hp.max_hp = 95 + GameManager.Instance.currentWave * 5;
-        // pc.spellcaster.mana = 90 + GameManager.Instance.currentWave * 10;
-        // pc.spellcaster.mana_reg = GameManager.Instance.currentWave + 10;
-        // pc.spellcaster.spell_power = GameManager.Instance.currentWave * 10;
-        // pc.speed = 5;
-
         var ev = new Evaluator(new() { { "wave", GameManager.Instance.currentWave } });
 
-        pc.hp.hp = pc.hp.max_hp = ev.EvaluateInt(pc.playerClass.health);
+        pc.hp.max_hp = ev.EvaluateInt(pc.playerClass.health);
         pc.spellcaster.mana = ev.EvaluateInt(pc.playerClass.mana);
         pc.spellcaster.mana_reg = ev.EvaluateInt(pc.playerClass.mana_regeneration);
         pc.spellcaster.spell_power = ev.EvaluateInt(pc.playerClass.spellpower);
         pc.speed = ev.EvaluateInt(pc.playerClass.speed);
+
+        foreach (var slot in pc.Equipments)
+            if (slot.Item?.Equipment is Equipment equipment)
+            {
+                pc.hp.max_hp += equipment.max_hp;
+                pc.spellcaster.mana += equipment.mana;
+                pc.spellcaster.mana_reg += equipment.mana_reg;
+                pc.spellcaster.spell_power += equipment.spell_power;
+                pc.speed += equipment.speed;
+            }
+
+        pc.hp.hp = pc.hp.max_hp;
 
         StartCoroutine(SpawnWave());
     }

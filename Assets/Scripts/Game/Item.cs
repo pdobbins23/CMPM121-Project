@@ -1,10 +1,12 @@
 #nullable enable
 
+using System;
+
 public class Item
 {
     public readonly Spell? Spell;
     public readonly Relic? Relic;
-    // public readonly Equipment _equipment;
+    public readonly Equipment? Equipment;
 
     public Item(Spell spell)
     {
@@ -16,20 +18,33 @@ public class Item
         Relic = relic;
     }
 
-    // public Item(Equipment equipment)
-    // {
-    //     _equipment = equipment;
-    // }
+    public Item(Equipment equipment)
+    {
+        Equipment = equipment;
+    }
 }
 
 public class ItemSlot
 {
     public Item? Item;
-    public bool TakeOnly;
+    public readonly bool AllowPut = true;
+    public readonly Func<Item, bool>? _filter;
 
-    public ItemSlot(Item? item = null, bool take_only = false)
+    public ItemSlot(Item? item = null, bool allow_put = true)
     {
         Item = item;
-        TakeOnly = take_only;
+        AllowPut = allow_put;
+        _filter = null;
+    }
+
+    public ItemSlot(Item? item, Func<Item, bool> filter)
+    {
+        Item = item;
+        _filter = filter;
+    }
+
+    public bool CanPut(Item item)
+    {
+        return AllowPut && (_filter == null || _filter(item));
     }
 }

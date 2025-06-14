@@ -19,7 +19,9 @@ public class PlayerController : MonoBehaviour
     public int speed;
 
     public List<ItemSlot> Inventory = new();
-    public ItemSlot InventorySlot = new ItemSlot();
+    public List<ItemSlot> Equipments = new();
+
+    public ItemSlot ActiveSlot = new();
 
     public Unit unit;
 
@@ -37,9 +39,13 @@ public class PlayerController : MonoBehaviour
 
         Inventory.Clear();
         for (int i = 0; i < 8; i++) Inventory.Add(new ItemSlot());
+        Equipments.Clear();
+        Equipments.Add(new ItemSlot(null, item => item.Equipment?.Type == 0));
+        Equipments.Add(new ItemSlot(null, item => item.Equipment?.Type == 1));
+        Equipments.Add(new ItemSlot(null, item => item.Equipment?.Type == 2));
 
-        InventorySlot = Inventory[0];
-        InventorySlot.Item = new Item(startingSpell);
+        ActiveSlot = Inventory[0];
+        ActiveSlot.Item = new Item(startingSpell);
 
         StartCoroutine(spellcaster.ManaRegeneration());
 
@@ -67,7 +73,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public void SelectSlot(ItemSlot slot) {
-        InventorySlot = slot;
+        ActiveSlot = slot;
     }
 
     void OnAttack(InputValue value)
@@ -77,7 +83,7 @@ public class PlayerController : MonoBehaviour
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
         mouseWorld.z = 0;
 
-        if (Inventory.Contains(InventorySlot) && InventorySlot.Item?.Spell is Spell spell)
+        if (Inventory.Contains(ActiveSlot) && ActiveSlot.Item?.Spell is Spell spell)
             StartCoroutine(spellcaster.Cast(spell, transform.position, mouseWorld));
     }
 

@@ -38,19 +38,22 @@ public class RelicManager
     public void Update()
     {
         var inventory = GameManager.Instance.player.GetComponent<PlayerController>().Inventory;
+        var inventoryRelics = inventory
+            .Select(slot => slot.Item?.Relic)
+            .Where(relic => relic != null)
+            .Cast<Relic>()
+            .ToList();
 
         for (int i = ActiveRelics.Count - 1; i >= 0; i--)
         {
             var relic = ActiveRelics[i];
-
-            if (inventory.Any(slot => slot.Item?.Relic == relic))
-            {
-                relic.Update();
-                continue;
-            }
-
+            if (inventoryRelics.Contains(relic)) continue;
             relic.UnregisterTrigger();
             ActiveRelics.RemoveAt(i);
         }
+
+        ActiveRelics.Clear();
+        ActiveRelics.AddRange(inventoryRelics);
+        foreach (var relic in ActiveRelics) relic.Update();
     }
 }
