@@ -25,12 +25,11 @@ public class Item
 public class ItemSlot
 {
     public Item? Item;
-    public bool Highlighted = false;
+    public bool TakeOnly;
 
-    public ItemSlot() { }
-
-    public ItemSlot(Item? item)
+    public ItemSlot(Item? item = null, bool take_only = false)
     {
         Item = item;
+        TakeOnly = take_only;
     }
 }

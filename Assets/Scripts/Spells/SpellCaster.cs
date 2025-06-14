@@ -10,7 +10,6 @@ public class SpellCaster
     public Hittable.Team team;
 
     public float spell_power = 10f;
-    public List<Spell> spells = new List<Spell>();
 
     public IEnumerator ManaRegeneration()
     {
@@ -35,10 +34,8 @@ public class SpellCaster
         mana = Mathf.Min(mana + added_mana, max_mana);
     }
 
-    public IEnumerator Cast(int index, Vector3 where, Vector3 target)
+    public IEnumerator Cast(Spell spell, Vector3 where, Vector3 target)
     {
-        var spell = spells[index];
-
         int manaCost = spell.GetManaCost();
 
         if (mana >= manaCost && spell.IsReady())

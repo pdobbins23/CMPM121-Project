@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Linq;
 
 public class Game : MonoBehaviour
@@ -64,21 +65,19 @@ public class InterfaceBlock : MultiBlock
         Refresh();
     }
 
-    public void Refresh()
+    public override void Refresh()
     {
         if (_inventory == null)
         {
             _inventory = new InventoryBlock();
             Add(_inventory).At(32, 32, 160, 30);
         }
-        _inventory.Refresh();
 
         if (_waveStatus == null)
         {
             _waveStatus = new WaveStatusBlock();
             Add(_waveStatus).Center(0, 465, 800, 36);
         }
-        _waveStatus.Refresh();
 
         if (_classMenu == null && _ui.class_ == null)
         {
@@ -87,7 +86,7 @@ public class InterfaceBlock : MultiBlock
         }
         else if (_classMenu != null && _ui.class_ != null)
         {
-            GameObject.Destroy(_classMenu.go);
+            Remove(_classMenu);
             _classMenu = null;
 
             PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
@@ -101,7 +100,7 @@ public class InterfaceBlock : MultiBlock
         }
         else if (_levelMenu != null && _ui.level != null)
         {
-            GameObject.Destroy(_levelMenu.go);
+            Remove(_levelMenu);
             _levelMenu = null;
 
             _ui.wm.StartLevel(_ui.level);
@@ -114,7 +113,7 @@ public class InterfaceBlock : MultiBlock
         }
         else if (_home != null && _ui.home_overlay == null)
         {
-            GameObject.Destroy(_home.go);
+            Remove(_home);
             _home = null;
         }
 
@@ -149,34 +148,37 @@ public class InterfaceBlock : MultiBlock
         }
         else if (_rewardMenu != null && GameManager.Instance.state != GameManager.GameState.ENDINGWAVE)
         {
-            GameObject.Destroy(_rewardMenu.go);
+            Remove(_rewardMenu);
             _rewardMenu = null;
         }
+
+        base.Refresh();
     }
 }
 
 public class InventoryBlock : MultiBlock
 {
-    public InventoryBlock() { } // List<ItemSlot> inventory
+    List<ItemSlot> _inventory = new();
 
-    public void Refresh()
+    public override void Refresh()
     {
-        Clear();
-
-        if (GameManager.Instance.player == null) return;
-        PlayerController pc = GameManager.Instance.player.GetComponent<PlayerController>();
-        if (pc.spellcaster == null) return;
-
-        for (int i = 0; i < 4; i++)
+        var inventory = GameManager.Instance.player?.GetComponent<PlayerController>()?.Inventory ?? new();
+        if (_inventory.SequenceEqual(inventory))
         {
-            var slot = new ItemSlot(i < pc.spellcaster.spells.Count ? new Item(pc.spellcaster.spells[i]) : null);
-            slot.Highlighted = pc.currentSpell == i;
-            Add(new ItemBlock(slot)).At(i * (64 + 8), 0, 64, 64);
+            base.Refresh();
+            return;
+        }
+
+        _inventory = inventory.ToList();
+
+        for (int i = 0; i < _inventory.Count; i++)
+        {
+            Add(new ItemBlock(_inventory[i])).At(i * (64 + 8), 0, 64, 64);
         }
     }
 }
 
-public class ItemBlock : MultiBlock
+public class ItemBlock : EventBlock
 {
     private readonly List<string> _spell_sprites = new() {
         "ProjectUtumno_full_1910",
@@ -219,19 +221,24 @@ public class ItemBlock : MultiBlock
 
     private readonly ItemSlot _slot;
 
+    private bool hovered;
+    private bool shift_up;
+
     public ItemBlock(ItemSlot slot)
     {
         _slot = slot;
     }
 
-    public override Block Sized(float width, float height)
+    public override void Refresh()
     {
-        if (width != height) throw new ArgumentException("Width and height must be equal.");
-        float s = width / 64;
+        float size = go.GetComponent<RectTransform>().sizeDelta.x;
+        float s = size / 64;
+
+        var pc = GameManager.Instance.player.GetComponent<PlayerController>();
 
         Clear();
         Add(new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"))).Center(0, 0, 64 * s, 64 * s);
-        Add(new RectBlock(_slot.Highlighted ? 0xff0000 : 0x000000)).Center(0, 0, 52 * s, 52 * s);
+        Add(new RectBlock(pc.InventorySlot == _slot ? 0xff0000 : 0x000000)).Center(0, 0, 52 * s, 52 * s);
 
         if (_slot.Item?.Spell is Spell spell)
         {
@@ -257,6 +264,70 @@ public class ItemBlock : MultiBlock
             Add(new RectBlock(0xfff1d2)).Center(0, 0, 46 * s, 46 * s);
         }
 
+        if (_slot.Item != null && hovered)
+        {
+            var tooltip = Add(new TooltipBlock(_slot));
+            if (shift_up)
+                tooltip.At(0, size + 20, 500, 300);
+            else
+                tooltip.At(size + 20, size - 400, 500, 300);
+        }
+    }
+
+    public override void OnPointerEnter(PointerEventData ev)
+    {
+        hovered = true;
+        shift_up = ev.position.y < 400;
+    }
+
+    public override void OnPointerExit(PointerEventData ev)
+    {
+        hovered = false;
+    }
+
+    public override void OnPointerClick(PointerEventData ev)
+    {
+        var pc = GameManager.Instance.player.GetComponent<PlayerController>();
+        if (pc.InventorySlot == _slot)
+            pc.InventorySlot = new ItemSlot(null, false);
+        else if (pc.InventorySlot.Item != null && (_slot.Item == null && !_slot.TakeOnly))
+        {
+            _slot.Item = pc.InventorySlot.Item;
+            pc.InventorySlot.Item = null;
+            pc.InventorySlot = new ItemSlot(null, false);
+        }
+        else
+            pc.InventorySlot = _slot;
+    }
+}
+
+public class TooltipBlock : EventBlock
+{
+    private readonly ItemSlot _slot;
+
+    public TooltipBlock(ItemSlot slot)
+    {
+        var image = go.AddComponent<Image>();
+        image.sprite = Sprites.Get("Sprites/UI/panel", "tile_0001_0");
+        image.type = Image.Type.Tiled;
+
+        var canvas = go.AddComponent<Canvas>();
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = 1000;
+
+        _slot = slot;
+    }
+
+    public override Block Sized(float width, float height)
+    {
+        Clear();
+
+        if (_slot.Item?.Spell is Spell spell)
+        {
+            Add(new TextBlock(spell.GetName(), 0xffffff, height * 0.1f)).At(0, height * 0.65f, width, height * 0.35f);
+            Add(new TextBlock(spell.GetDescription(), 0xffffff, height * 0.07f)).At(0, 0, width, height * 0.7f);
+        }
+
         return base.Sized(width, height);
     }
 }
@@ -271,7 +342,7 @@ public class WaveStatusBlock : MultiBlock
         Add(_text).Center(0, 0, 800, 36);
     }
 
-    public void Refresh()
+    public override void Refresh()
     {
         switch (GameManager.Instance.state)
         {
@@ -344,31 +415,20 @@ public class RewardMenuBlock : MultiBlock
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
         Add(new ButtonBlock("Craft", (obj) => {
-            craftingMenu.Refresh();
-            craftingMenu.go.SetActive(true);
+            craftingMenu?.go.SetActive(true);
         })).Center(-350, 300, 160, 64);
 
         Add(new TextBlock("Pick your rewards:", 0x333333)).Center(0, 325, 320, 32);
 
-        Add(new ItemBlock(new ItemSlot(new Item(rewardSpell)))).Center(0, 175, 200, 200);
+        Add(new ItemBlock(new ItemSlot(new Item(rewardSpell), false))).Center(0, 175, 200, 200);
         Add(new TextBlock(rewardSpell.GetName(), 0x333333)).Center(0, 50, 750, 32);
-
-        var acceptBtn = Add(new ButtonBlock("Accept", (obj) => {
-            var pc = GameManager.Instance.player.GetComponent<PlayerController>();
-
-            if (pc.spellcaster.spells.Count < 4)
-            {
-                pc.spellcaster.spells.Add(rewardSpell);
-                obj.go.SetActive(false);
-            }
-        })).Center(0, 10, 160, 32);
 
         var takeRelicButtons = new List<Block>();
 
         for (int i = 0; i < rewardRelics.Count(); i++) {
             var rewardRelic = rewardRelics[i];
 
-            Add(new ItemBlock(new ItemSlot(new Item(rewardRelic)))).Center(250 * (i - 1), -100, 100, 100);
+            Add(new ItemBlock(new ItemSlot(new Item(rewardRelic), false))).Center(250 * (i - 1), -100, 100, 100);
             Add(new TextBlock(rewardRelic.Name, 0x333333)).Center(250 * (i - 1), -190, 300, 32);
 
             var btn = Add(new ButtonBlock("Take", (obj) => {
@@ -392,171 +452,62 @@ public class RewardMenuBlock : MultiBlock
 
 public class CraftingMenuBlock : MultiBlock
 {
-    struct SpellItem
-    {
-        public Spell? spell;
-        public ImageBlock icon;
 
-        public SpellItem(Spell? spell, ImageBlock icon)
-        {
-            this.spell = spell;
-            this.icon = icon;
-        }
-    }
+    private ItemSlot _item_left = new();
+    private ItemSlot _item_right = new();
+    private ItemSlot _item_output = new(null, false);
 
-    private List<SpellItem> _items = new();
+    private bool _has_crafted;
 
-    private SpellItem _item_a = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
-    private SpellItem _item_b = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
-
-    private Block _item_a_rmbtn;
-    private Block _item_b_rmbtn;
-
-    private Block _craft_btn;
-
-    private readonly List<string> _spell_sprites = new() {
-        "ProjectUtumno_full_1910",
-        "ProjectUtumno_full_1908",
-        "ProjectUtumno_full_1915",
-        "ProjectUtumno_full_1911",
-        "ProjectUtumno_full_1906",
-        "ProjectUtumno_full_2002",
-        "ProjectUtumno_full_1951",
-        "ProjectUtumno_full_1998",
-        "ProjectUtumno_full_2005",
-        "ProjectUtumno_full_2027",
-        "ProjectUtumno_full_2031",
-        "ProjectUtumno_full_2037",
-        "ProjectUtumno_full_2039",
-        "ProjectUtumno_full_2041",
-        "ProjectUtumno_full_2130",
-        "ProjectUtumno_full_2132",
-        "ProjectUtumno_full_2135",
-        "ProjectUtumno_full_2198",
-    };
+    private Block _close_button;
 
     public CraftingMenuBlock(Interface ui) {
         Add(new PanelBlock()).Center(0, 0, 1000, 800);
 
-        Add(_item_a.icon).Center(-200, 0, 200, 200);
-        Add(_item_b.icon).Center(200, 0, 200, 200);
+        Add(new ItemBlock(_item_left)).Center(-350, 0, 200, 200);
+        Add(new ItemBlock(_item_right)).Center(-100, 0, 200, 200);
+        Add(new ItemBlock(_item_output)).Center(300, 0, 200, 200);
 
-        _item_a_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
-            _craft_btn.go.SetActive(false);
-            _item_a_rmbtn.go.SetActive(false);
-            Refresh();
-        })).Center(-200, 180, 100, 32);
-        _item_a_rmbtn.go.SetActive(false);
-
-        _item_b_rmbtn = Add(new ButtonBlock("Remove", (obj) => {
-            _craft_btn.go.SetActive(false);
-            _item_b_rmbtn.go.SetActive(false);
-            Refresh();
-        })).Center(200, 180, 100, 32);
-        _item_b_rmbtn.go.SetActive(false);
-
-        _craft_btn = Add(new ButtonBlock("Craft", (obj) => {
-            if (_item_a.spell == null || _item_b.spell == null) return;
-
-            var crafted = RawSpell.CraftSpell(_item_a.spell.GetRaw(), _item_b.spell.GetRaw());
-
-            var pc = GameManager.Instance.player.GetComponent<PlayerController>();
-            pc.spellcaster.spells.Remove(_item_a.spell);
-            pc.spellcaster.spells.Remove(_item_b.spell);
-            pc.spellcaster.spells.Add(new Spell(crafted, pc.spellcaster));
-
-            go.SetActive(false);
-        })).Center(0, -150, 200, 50);
-        _craft_btn.go.SetActive(false);
-
-        Add(new ButtonBlock("Close", (obj) => {
+        _close_button = Add(new ButtonBlock("Close", (obj) => {
             go.SetActive(false);
         })).Center(0, -300, 160, 32);
     }
 
-    public void Refresh()
+    public override void Refresh()
     {
-        foreach (var spellItem in _items)
-            GameObject.Destroy(spellItem.icon.go);
-        _items = new();
-
-        _item_a_rmbtn.go.SetActive(false);
-        _item_b_rmbtn.go.SetActive(false);
-
-        var pc = GameManager.Instance.player.GetComponent<PlayerController>();
-        var spells = pc.spellcaster.spells;
-
-        for (int idx = 0; idx < spells.Count(); idx++)
+        if (_has_crafted)
         {
-            int i = idx;
-
-            var spell = spells[i];
-            var item = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
-
-            _items.Add(item);
-
-            var icon = Add(item.icon).Center(150 * (i - 1), 300, 100, 100);
-
-            Add(new ButtonBlock("Select", (obj) => {
-                if (_item_a.spell == null)
-                {
-                    GameObject.Destroy(_item_a.icon.go);
-                    GameObject.Destroy(_items[i].icon.go);
-
-                    _item_a = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
-                    Add(_item_a.icon).Center(-200, 0, 200, 200);
-
-                    _items[i] = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
-                    Add(_items[i].icon).Center(150 * (i - 1), 300, 100, 100);
-
-                    obj.go.SetActive(false);
-
-                    _item_a_rmbtn.go.SetActive(true);
-                }
-                else if (_item_b.spell == null)
-                {
-                    GameObject.Destroy(_item_b.icon.go);
-                    GameObject.Destroy(_items[i].icon.go);
-
-                    _item_b = new SpellItem(spell, new ImageBlock(Sprites.Get("Sprites/Tiles/ProjectUtumno_full", _spell_sprites[spell.GetIcon()])));
-                    Add(_item_b.icon).Center(200, 0, 200, 200);
-
-                    _items[i] = new SpellItem(null, new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0")));
-                    Add(_items[i].icon).Center(150 * (i - 1), 300, 100, 100);
-
-                    obj.go.SetActive(false);
-
-                    _item_b_rmbtn.go.SetActive(true);
-
-                    _craft_btn.go.SetActive(true);
-                }
-            })).Center(150 * (i - 1), 225, 100, 32);
+            if (_item_output.Item == null)
+            {
+                _item_left.Item = null;
+                _item_right.Item = null;
+            }
+            if (_item_left.Item == null || _item_right.Item == null)
+            {
+                _item_output.Item = null;
+                _has_crafted = false;
+            }
         }
 
-        if (_item_a.spell != null)
+        if (_item_left.Item?.Spell is Spell a && _item_right.Item?.Spell is Spell b)
         {
-            GameObject.Destroy(_item_a.icon.go);
-
-            _item_a.spell = null;
-            _item_a.icon = new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"));
-
-            Add(_item_a.icon).Center(-200, 0, 200, 200);
+            var crafted = RawSpell.CraftSpell(a.GetRaw(), b.GetRaw());
+            var pc = GameManager.Instance.player.GetComponent<PlayerController>();
+            _item_output.Item = new Item(new Spell(crafted, pc.spellcaster));
+            _has_crafted = true;
         }
-        if (_item_b.spell != null)
-        {
-            GameObject.Destroy(_item_b.icon.go);
 
-            _item_b.spell = null;
-            _item_b.icon = new ImageBlock(Sprites.Get("Sprites/UI/box", "tile_0000_0"));
+        _close_button.go.SetActive(_item_left.Item == null && _item_right.Item == null);
 
-            Add(_item_b.icon).Center(200, 0, 200, 200);
-        }
+        base.Refresh();
     }
 }
 
 public class HomeBlock : MultiBlock
 {
     private readonly Interface _ui;
+    private string? _home_overlay;
+    private bool _refresh;
 
     public HomeBlock(Interface ui)
     {
@@ -564,7 +515,12 @@ public class HomeBlock : MultiBlock
         Refresh();
     }
 
-    public void Refresh() {
+    public override void Refresh()
+    {
+        if (_home_overlay == _ui.home_overlay && !_refresh) return;
+        _home_overlay = _ui.home_overlay;
+        _refresh = false;
+
         Clear();
 
         Add(new RectBlock(0x876542)).Center(0, 0, 15360, 8640);
@@ -604,12 +560,12 @@ public class HomeBlock : MultiBlock
                 var am = AudioManager.Instance;
                 Add(new TextBlock($"SFX Volume: {Math.Round(am.SfxVolume * 100)}%", 0x7a4e1c)).Center(-150, 80, 300, 30);
                 Add(new TextBlock($"Music Volume: {Math.Round(am.MusicVolume * 100)}%", 0x7a4e1c)).Center(-150, 0, 300, 30);
-                Add(new ButtonBlock("Mute", _ => { am.SfxVolume = 0; Refresh(); })).Center(50, 80, 90, 40);
-                Add(new ButtonBlock("Mute", _ => { am.MusicVolume = 0; Refresh(); })).Center(50, 0, 90, 40);
-                Add(new ButtonBlock("-", _ => { am.SfxVolume = Math.Clamp(am.SfxVolume - 0.1f, 0, 1); Refresh(); })).Center(125, 80, 40, 40);
-                Add(new ButtonBlock("-", _ => { am.MusicVolume = Math.Clamp(am.MusicVolume - 0.1f, 0, 1); Refresh(); })).Center(125, 0, 40, 40);
-                Add(new ButtonBlock("+", _ => { am.SfxVolume = Math.Clamp(am.SfxVolume + 0.1f, 0, 1); Refresh(); })).Center(175, 80, 40, 40);
-                Add(new ButtonBlock("+", _ => { am.MusicVolume = Math.Clamp(am.MusicVolume + 0.1f, 0, 1); Refresh(); })).Center(175, 0, 40, 40);
+                Add(new ButtonBlock("Mute", _ => { am.SfxVolume = 0; _refresh = true; })).Center(50, 80, 90, 40);
+                Add(new ButtonBlock("Mute", _ => { am.MusicVolume = 0; _refresh = true; })).Center(50, 0, 90, 40);
+                Add(new ButtonBlock("-", _ => { am.SfxVolume = Math.Clamp(am.SfxVolume - 0.1f, 0, 1); _refresh = true; })).Center(125, 80, 40, 40);
+                Add(new ButtonBlock("-", _ => { am.MusicVolume = Math.Clamp(am.MusicVolume - 0.1f, 0, 1); _refresh = true; })).Center(125, 0, 40, 40);
+                Add(new ButtonBlock("+", _ => { am.SfxVolume = Math.Clamp(am.SfxVolume + 0.1f, 0, 1); _refresh = true; })).Center(175, 80, 40, 40);
+                Add(new ButtonBlock("+", _ => { am.MusicVolume = Math.Clamp(am.MusicVolume + 0.1f, 0, 1); _refresh = true; })).Center(175, 0, 40, 40);
 
                 var colorblindness = HealthBar.ColorBlindMode switch {
                     1 => "Red-Green",
@@ -617,9 +573,9 @@ public class HomeBlock : MultiBlock
                     _ => "Off",
                 };
                 Add(new TextBlock($"Colorblindness Mode: {colorblindness}", 0x7a4e1c)).Center(-225, -80, 450, 30);
-                Add(new ButtonBlock("R/G", _ => { HealthBar.ColorBlindMode = 1; Refresh(); })).Center(50, -80, 90, 40);
-                Add(new ButtonBlock("Full", _ => { HealthBar.ColorBlindMode = 2; Refresh(); })).Center(150, -80, 90, 40);
-                Add(new ButtonBlock("Off", _ => { HealthBar.ColorBlindMode = 0; Refresh(); })).Center(250, -80, 90, 40);
+                Add(new ButtonBlock("R/G", _ => { HealthBar.ColorBlindMode = 1; _refresh = true; })).Center(50, -80, 90, 40);
+                Add(new ButtonBlock("Full", _ => { HealthBar.ColorBlindMode = 2; _refresh = true; })).Center(150, -80, 90, 40);
+                Add(new ButtonBlock("Off", _ => { HealthBar.ColorBlindMode = 0; _refresh = true; })).Center(250, -80, 90, 40);
 
                 break;
         }

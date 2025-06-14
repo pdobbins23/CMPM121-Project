@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Block
@@ -26,15 +27,14 @@ public class Block
         throw new NotImplementedException("Set must be overriden");
     }
 
+    public virtual void Refresh() { }
+
     public Block At(float x, float y, float? w = null, float? h = null)
     {
         var rt = go.GetComponent<RectTransform>();
         rt.anchoredPosition = new Vector2(x, y);
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0, 0);
-        if (w != null && h != null)
-        {
-            Sized(w.Value, h.Value);
-        }
+        if (w != null && h != null) Sized(w.Value, h.Value);
         return this;
     }
 
@@ -43,10 +43,7 @@ public class Block
         var rt = go.GetComponent<RectTransform>();
         rt.anchoredPosition = new Vector2(x, y);
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-        if (w != null && h != null)
-        {
-            Sized(w.Value, h.Value);
-        }
+        if (w != null && h != null) Sized(w.Value, h.Value);
         return this;
     }
 
@@ -71,11 +68,23 @@ public class MultiBlock : Block
         return child;
     }
 
+    public override void Refresh()
+    {
+        foreach (var block in _children)
+            block.Refresh();
+    }
+
     protected void Clear()
     {
         foreach (var block in _children)
             GameObject.Destroy(block.go);
         _children.Clear();
+    }
+
+    protected void Remove(Block child)
+    {
+        GameObject.Destroy(child.go);
+        _children.Remove(child);
     }
 
     public void Attach()
@@ -89,6 +98,33 @@ public class MultiBlock : Block
         rt.offsetMin = Vector2.zero;
         rt.offsetMax = Vector2.zero;
     }
+}
+
+public class EventBlock : MultiBlock
+{
+    private class EventRelay : MonoBehaviour,
+        IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler,
+        IPointerDownHandler, IPointerUpHandler
+    {
+        public EventBlock? owner;
+
+        public void OnPointerClick(PointerEventData ev) => owner?.OnPointerClick(ev);
+        public void OnPointerEnter(PointerEventData ev) => owner?.OnPointerEnter(ev);
+        public void OnPointerExit(PointerEventData ev) => owner?.OnPointerExit(ev);
+        public void OnPointerDown(PointerEventData ev) => owner?.OnPointerDown(ev);
+        public void OnPointerUp(PointerEventData ev) => owner?.OnPointerUp(ev);
+    }
+
+    public EventBlock()
+    {
+        go.AddComponent<EventRelay>().owner = this;
+    }
+
+    public virtual void OnPointerClick(PointerEventData ev) { }
+    public virtual void OnPointerEnter(PointerEventData ev) { }
+    public virtual void OnPointerExit(PointerEventData ev) { }
+    public virtual void OnPointerDown(PointerEventData ev) { }
+    public virtual void OnPointerUp(PointerEventData ev) { }
 }
 
 public class ImageBlock : Block
@@ -154,17 +190,19 @@ public class RectBlock : Block
 public class TextBlock : Block
 {
     private readonly TextMeshProUGUI _text;
+    private readonly float? _fontSizeOverride;
 
-    public TextBlock(string text, int color)
+    public TextBlock(string text, int color, float? fontSizeOverride = null)
     {
         _text = go.AddComponent<TextMeshProUGUI>();
-        _text.alignment = TextAlignmentOptions.Center;
         _text.color = new Color32(
             (byte)((color >> 16) & 0xff),
             (byte)((color >> 8) & 0xff),
             (byte)(color & 0xff),
             255
         );
+
+        _fontSizeOverride = fontSizeOverride;
 
         Set(text);
     }
@@ -193,7 +231,7 @@ public class TextBlock : Block
 
     public override Block Sized(float w, float h)
     {
-        _text.fontSize = h;
+        _text.fontSize = _fontSizeOverride ?? h;
         return base.Sized(w, h);
     }
 }

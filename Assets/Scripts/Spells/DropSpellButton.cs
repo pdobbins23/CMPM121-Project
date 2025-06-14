@@ -6,6 +6,5 @@ public class DropSpellButton : MonoBehaviour
 
 	public void DropSpell(int index)
 	{
-		player.DropSpell(index);
 	}
 }

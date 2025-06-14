@@ -23,7 +23,8 @@ public class Spell
     public float LastCast() => lastCast;
 
     public RawSpell GetRaw() => rawSpell;
-    public string GetName() => rawSpell.Name;
+    public string GetName() => rawSpell.GetName();
+    public string GetDescription() => rawSpell.GetDescription();
     public int GetIcon() => rawSpell.Icon;
 
     public float GetDelay()

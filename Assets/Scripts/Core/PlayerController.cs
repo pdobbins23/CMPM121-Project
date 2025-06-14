@@ -19,7 +19,9 @@ public class PlayerController : MonoBehaviour
     public GameObject[] dropButtons = new GameObject[4];
 
     public int speed;
-    public int currentSpell = 0;
+
+    public List<ItemSlot> Inventory = new();
+    public ItemSlot InventorySlot = new ItemSlot();
 
     public Unit unit;
 
@@ -35,7 +37,11 @@ public class PlayerController : MonoBehaviour
 
         Spell startingSpell = new Spell(SpellManager.Instance.AllSpells["arcane_bolt"], spellcaster);
 
-        spellcaster.spells.Add(startingSpell);
+        Inventory.Clear();
+        for (int i = 0; i < 4; i++) Inventory.Add(new ItemSlot());
+
+        InventorySlot = Inventory[0];
+        InventorySlot.Item = new Item(startingSpell);
 
         StartCoroutine(spellcaster.ManaRegeneration());
 
@@ -46,48 +52,20 @@ public class PlayerController : MonoBehaviour
         // tell UI elements what to show
         healthui.SetHealth(hp);
         manaui.SetSpellCaster(spellcaster);
-        spellui[0].GetComponent<SpellUI>().SetSpell(spellcaster.spells[0]);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSpell(0);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSpell(1);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSpell(2);
-        if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSpell(3);
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(Inventory[0]);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSlot(Inventory[1]);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(Inventory[2]);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(Inventory[3]);
         if (Input.GetKeyDown(KeyCode.K)) GameManager.Instance.KillAllEnemies();
         RelicManager.Instance.Update();
     }
 
-    public void SelectSpell(int index) {
-        if (index >= spellcaster.spells.Count) return;
-        currentSpell = index;
-        UpdateSpellUi();
-    }
-
-    public void DropSpell(int index)
-    {
-        if (index >= spellcaster.spells.Count) return;
-        if (currentSpell > index || (currentSpell == index && index > 0)) currentSpell--;
-        spellcaster.spells.RemoveAt(index);
-        UpdateSpellUi();
-    }
-
-    public void UpdateSpellUi()
-    {
-        for (int i = 0; i < 4; i++)
-            spellui[i].SetActive(false);
-
-        foreach (var btn in dropButtons)
-            btn.SetActive(false);
-
-        for (int i = 0; i < spellcaster.spells.Count; i++)
-        {
-            spellui[i].SetActive(true);
-            spellui[i].GetComponent<SpellUI>().SetSpell(spellcaster.spells[i]);
-            spellui[i].GetComponent<SpellUI>().SetHighlight(i == currentSpell ? Color.red : Color.black);
-        }
+    public void SelectSlot(ItemSlot slot) {
+        InventorySlot = slot;
     }
 
     void OnAttack(InputValue value)
@@ -96,7 +74,9 @@ public class PlayerController : MonoBehaviour
         Vector2 mouseScreen = Mouse.current.position.value;
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
         mouseWorld.z = 0;
-        StartCoroutine(spellcaster.Cast(currentSpell, transform.position, mouseWorld));
+
+        if (Inventory.Contains(InventorySlot) && InventorySlot.Item?.Spell is Spell spell)
+            StartCoroutine(spellcaster.Cast(spell, transform.position, mouseWorld));
     }
 
     void OnMove(InputValue value)

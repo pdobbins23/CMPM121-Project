@@ -6,7 +6,5 @@ public class SelectSpellButton : MonoBehaviour
 
 	public void Select(int spell)
 	{
-		player.currentSpell = spell;
-		Debug.Log("what");
 	}
 }
