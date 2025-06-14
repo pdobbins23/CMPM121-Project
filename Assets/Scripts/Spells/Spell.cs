@@ -17,124 +17,102 @@ public class Spell
 
     public bool IsReady()
     {
-        return Time.time > lastCast + RPN.eval(rawSpell.CoolDown, owner.GetContext().ToDictionary());
+        return Time.time > lastCast + owner.Evaluate(rawSpell.Cooldown);
     }
 
     public float LastCast() => lastCast;
 
-    public string GetName() => rawSpell.Name;
+    public RawSpell GetRaw() => rawSpell;
+    public string GetName() => rawSpell.GetName();
+    public string GetDescription() => rawSpell.GetDescription();
     public int GetIcon() => rawSpell.Icon;
 
     public float GetDelay()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.Delay ?? "0", ctx);
+        return owner.Evaluate(rawSpell.Mod.Delay ?? "0");
     }
 
     public float GetAngle()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.Angle ?? "0", ctx);
+        return owner.Evaluate(rawSpell.Mod.Angle ?? "0");
     }
 
     public int GetCount()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.EvalInt(rawSpell.Count ?? "1", ctx);
+        return owner.EvaluateInt(rawSpell.Count ?? "1");
     }
 
     public float GetSpray()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.Spray ?? "0", ctx);
+        return owner.Evaluate(rawSpell.Spray ?? "0");
     }
 
-    public float GetBaseLifeTime()
+    public float GetBaseLifetime()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.BaseProjectile?.LifeTime ?? "100", ctx);
+        return owner.Evaluate(rawSpell.Projectile?.Lifetime ?? "100");
     }
 
-    public float GetSecondaryLifeTime()
+    public float GetSecondaryLifetime()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.SecondaryProjectile?.LifeTime ?? "100", ctx);
+        return owner.Evaluate(rawSpell.SecondaryProjectile?.Lifetime ?? "100");
     }
 
     public int GetManaCost()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float manaCost = RPN.eval(rawSpell.ManaCost, ctx);
-        float manaAdder = RPN.eval(rawSpell.ManaAdder ?? "0", ctx);
-        float manaMultiplier = RPN.eval(rawSpell.ManaMultiplier ?? "1", ctx);
+        float manaCost = owner.Evaluate(rawSpell.ManaCost);
+        float manaAdder = owner.Evaluate(rawSpell.Mod.ManaAdder ?? "0");
+        float manaMultiplier = owner.Evaluate(rawSpell.Mod.ManaMultiplier ?? "1");
 
         return Mathf.RoundToInt((manaCost + manaAdder) * manaMultiplier);
     }
 
     public float GetBaseDamage()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float damage = RPN.eval(rawSpell.BaseDamage?.Amount ?? "0", ctx);
-        float damageAdder = RPN.eval(rawSpell.DamageAdder ?? "0", ctx);
-        float damageMultiplier= RPN.eval(rawSpell.DamageMultiplier ?? "1", ctx);
+        float damage = owner.Evaluate(rawSpell.Damage?.Amount ?? "0");
+        float damageAdder = owner.Evaluate(rawSpell.Mod.DamageAdder ?? "0");
+        float damageMultiplier= owner.Evaluate(rawSpell.Mod.DamageMultiplier ?? "1");
 
         return (damage + damageAdder) * damageMultiplier;
     }
 
     public float GetSecondaryDamage()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        return RPN.eval(rawSpell.SecondaryDamage ?? "0", ctx);
+        return owner.Evaluate(rawSpell.SecondaryDamage ?? "0");
     }
 
-    public float GetCoolDown()
+    public float GetCooldown()
     {
-        var ctx = owner.GetContext().ToDictionary();
+        float cooldown = owner.Evaluate(rawSpell.Cooldown ?? "0");
+        float cooldownAdder = owner.Evaluate(rawSpell.Mod.CooldownAdder ?? "0");
+        float cooldownMultiplier = owner.Evaluate(rawSpell.Mod.CooldownMultiplier ?? "1");
 
-        float coolDown = RPN.eval(rawSpell.CoolDown ?? "0", ctx);
-        float coolDownAdder = RPN.eval(rawSpell.CoolDownAdder ?? "0", ctx);
-        float coolDownMultiplier = RPN.eval(rawSpell.CoolDownMultiplier ?? "1", ctx);
-
-        return (coolDown + coolDownAdder) * coolDownMultiplier;
+        return (cooldown + cooldownAdder) * cooldownMultiplier;
     }
 
     public float GetBaseProjectileSpeed()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float speed = RPN.eval(rawSpell.BaseProjectile?.Speed ?? "0", ctx);
-        float speedAdder = RPN.eval(rawSpell.SpeedAdder ?? "0", ctx);
-        float speedMultiplier = RPN.eval(rawSpell.SpeedMultiplier ?? "1", ctx);
+        float speed = owner.Evaluate(rawSpell.Projectile?.Speed ?? "0");
+        float speedAdder = owner.Evaluate(rawSpell.Mod.SpeedAdder ?? "0");
+        float speedMultiplier = owner.Evaluate(rawSpell.Mod.SpeedMultiplier ?? "1");
 
         return (speed + speedAdder) * speedMultiplier;
     }
 
     public float GetSecondaryProjectileSpeed()
     {
-        var ctx = owner.GetContext().ToDictionary();
-
-        float speed = RPN.eval(rawSpell.SecondaryProjectile?.Speed ?? "0", ctx);
-        float speedAdder = RPN.eval(rawSpell.SpeedAdder ?? "0", ctx);
-        float speedMultiplier = RPN.eval(rawSpell.SpeedMultiplier ?? "1", ctx);
+        float speed = owner.Evaluate(rawSpell.SecondaryProjectile?.Speed ?? "0");
+        float speedAdder = owner.Evaluate(rawSpell.Mod.SpeedAdder ?? "0");
+        float speedMultiplier = owner.Evaluate(rawSpell.Mod.SpeedMultiplier ?? "1");
 
         return (speed + speedAdder) * speedMultiplier;
     }
 
     private void FireProjectile(Vector3 where, Vector3 dir)
     {
-        string baseTrajectory = rawSpell.ProjectileTrajectory ?? rawSpell.BaseProjectile?.Trajectory;
-        
+        string baseTrajectory = rawSpell.Mod.ProjectileTrajectory ?? rawSpell.Projectile?.Trajectory;
+
         GameManager.Instance.projectileManager.CreateProjectile(
-            rawSpell.Icon, baseTrajectory, where, dir, GetBaseProjectileSpeed(), OnHit, GetBaseLifeTime());
+            rawSpell.Icon, baseTrajectory, where, dir, GetBaseProjectileSpeed(), OnHit, GetBaseLifetime());
     }
 
     private void FireBaseProjectiles(Vector3 where, Vector3 dir)
@@ -143,7 +121,7 @@ public class Spell
         float spray = GetSpray();
 
         var rnd = new System.Random();
-        
+
         for (int i = 0; i < count; i++)
         {
             Vector3 finalDir = dir;
@@ -154,7 +132,7 @@ public class Spell
                 finalDir = rot * finalDir;
             }
 
-            if (rawSpell.SplitProjectile == true)
+            if (rawSpell.Mod.SplitProjectile == true)
             {
                 float angleOffset = GetAngle();
                 Quaternion rotation1 = Quaternion.Euler(0, 0, angleOffset);
@@ -175,19 +153,17 @@ public class Spell
     public void FireSecondaryProjectile(Vector3 where, Vector3 dir)
     {
         GameManager.Instance.projectileManager.CreateProjectile(
-            rawSpell.Icon, rawSpell.SecondaryProjectile?.Trajectory, where, dir, GetSecondaryProjectileSpeed(), OnSecondaryHit, GetSecondaryLifeTime());
+            rawSpell.Icon, rawSpell.SecondaryProjectile?.Trajectory, where, dir, GetSecondaryProjectileSpeed(), OnSecondaryHit, GetSecondaryLifetime());
     }
 
     public IEnumerator Cast(Vector3 where, Vector3 target, Hittable.Team team)
     {
         lastCast = Time.time;
-        var ctx = owner.GetContext().ToDictionary();
-
         Vector3 dir = (target - where).normalized;
 
         FireBaseProjectiles(where, dir);
 
-        if (rawSpell.DoubleProjectile == true)
+        if (rawSpell.Mod.DoubleProjectile == true)
         {
             yield return new WaitForSeconds(GetDelay());
 
@@ -201,7 +177,7 @@ public class Spell
     {
         if (other.team != owner.team)
         {
-            other.Damage(new Damage(Mathf.RoundToInt(GetBaseDamage()), Damage.TypeFromString(rawSpell.BaseDamage?.Type)));
+            other.Damage(new Damage(Mathf.RoundToInt(GetBaseDamage()), Damage.TypeFromString(rawSpell.Damage?.Type)));
 
             if (rawSpell.SecondaryProjectile != null)
             {
@@ -225,7 +201,7 @@ public class Spell
     {
         if (other.team != owner.team)
         {
-            other.Damage(new Damage(Mathf.RoundToInt(GetSecondaryDamage()), Damage.TypeFromString(rawSpell.BaseDamage?.Type)));
+            other.Damage(new Damage(Mathf.RoundToInt(GetSecondaryDamage()), Damage.TypeFromString(rawSpell.Damage?.Type)));
         }
     }
 }

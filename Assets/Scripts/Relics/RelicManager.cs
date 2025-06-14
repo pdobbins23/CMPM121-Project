@@ -1,10 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 public class RelicManager
 {
-    public List<RelicData> AllRelics = new List<RelicData>();
+    public List<Relic> AllRelics = new List<Relic>();
     public List<Relic> ActiveRelics = new List<Relic>();
 
     private static RelicManager theInstance;
@@ -30,15 +31,29 @@ public class RelicManager
         JArray relicArray = JArray.Parse(jsonFile.text);
         foreach (var relic in relicArray.Children<JObject>())
         {
-            AllRelics.Add(relic.ToObject<RelicData>());
+            AllRelics.Add(new Relic(relic.ToObject<RelicData>()));
         }
     }
 
     public void Update()
     {
-        foreach (var relic in ActiveRelics)
+        var inventory = GameManager.Instance.player.GetComponent<PlayerController>().Inventory;
+        var inventoryRelics = inventory
+            .Select(slot => slot.Item?.Relic)
+            .Where(relic => relic != null)
+            .Cast<Relic>()
+            .ToList();
+
+        for (int i = ActiveRelics.Count - 1; i >= 0; i--)
         {
-            relic.Update();
+            var relic = ActiveRelics[i];
+            if (inventoryRelics.Contains(relic)) continue;
+            relic.UnregisterTrigger();
+            ActiveRelics.RemoveAt(i);
         }
+
+        ActiveRelics.Clear();
+        ActiveRelics.AddRange(inventoryRelics);
+        foreach (var relic in ActiveRelics) relic.Update();
     }
 }

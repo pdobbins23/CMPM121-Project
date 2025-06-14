@@ -15,10 +15,20 @@ public class EventBus
     }
 
     public event Action<Hittable> OnKill;
-    public void DoKill(Hittable target) => OnKill?.Invoke(target);
+    public void DoKill(Hittable h)
+    {
+        OnKill?.Invoke(h);
+        AudioManager.Instance.PlaySound(AudioManager.Instance.enemyDeathSound);
+    }
+
 
     public event Action OnCast;
-    public void DoCast() => OnCast?.Invoke();
+    public void DoCast()
+    {
+        OnCast?.Invoke();
+        AudioManager.Instance.PlaySound(AudioManager.Instance.spellCastSound);
+    }
+
 
     public event Action<float> OnMove; // provide distance moved
     public void DoMove(float distance) => OnMove?.Invoke(distance);
@@ -27,5 +37,6 @@ public class EventBus
     public void DoDamage(Vector3 where, Damage dmg, Hittable target)
     {
         OnDamage?.Invoke(where, dmg, target);
+        AudioManager.Instance.PlaySound(AudioManager.Instance.damageSound);
     }
 }
