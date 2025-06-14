@@ -23,7 +23,7 @@ public struct RawSpell
         [JsonProperty("sprite")]
         public int Sprite { get; set; }
         [JsonProperty("lifetime")]
-        public string LifeTime { get; set; }
+        public string LifeTime { get; set; } ////////////////
     }
 
     // Base stuff
@@ -34,19 +34,19 @@ public struct RawSpell
     [JsonProperty("mana_cost")]
     public string ManaCost { get; set; }
     [JsonProperty("damage")]
-    public Damage? BaseDamage { get; set; }
+    public Damage? BaseDamage { get; set; } ////////////////
     [JsonProperty("secondary_damage")]
     public string? SecondaryDamage { get; set; }
     [JsonProperty("cooldown")]
-    public string? CoolDown { get; set; }
+    public string? CoolDown { get; set; } ////////////////
     [JsonProperty("icon")]
     public int Icon { get; set; }
-    [JsonProperty("N")]
+    [JsonProperty("count")]
     public string? Count { get; set; }
     [JsonProperty("spray")]
     public string? Spray { get; set; }
     [JsonProperty("projectile")]
-    public Projectile? BaseProjectile { get; set; }
+    public Projectile? BaseProjectile { get; set; } ////////////////
     [JsonProperty("secondary_projectile")]
     public Projectile? SecondaryProjectile { get; set; }
 
