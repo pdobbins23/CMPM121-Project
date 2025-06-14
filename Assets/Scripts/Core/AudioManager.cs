@@ -13,6 +13,9 @@ public class AudioManager : MonoBehaviour
     public AudioClip spellCastSound;
     public AudioClip enemyDeathSound;
 
+    public float SfxVolume;
+    public float MusicVolume;
+
     private void Awake()
     {
         if (Instance != null) throw new InvalidOperationException("Cannot initialize AudioManager multiple times");
@@ -21,8 +24,10 @@ public class AudioManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    private void Start()
+    private void Update()
     {
+        sfxSource.volume = SfxVolume * SfxVolume;
+        musicSource.volume = MusicVolume * MusicVolume;
         PlayMusic(backgroundMusic);
     }
 

@@ -580,26 +580,47 @@ public class HomeBlock : MultiBlock
                 break;
             case "credits":
                 Add(new ButtonBlock("Back", _ => { _ui.home_overlay = "home"; Refresh(); }).At(60, 60, 200, 50));
-                Add(new TextBlock("Credits", 0x7a4e1c)).Center(0, 160, 600, 60);
-                Add(new TextBlock("Peter Dobbins", 0x7a4e1c)).Center(0, -80, 600, 30);
-                Add(new TextBlock("Astra Tsai", 0x7a4e1c)).Center(0, -40, 600, 30);
-                Add(new TextBlock("Seeya Pillai", 0x7a4e1c)).Center(0, 0, 600, 30);
-                Add(new TextBlock("Anson Fong", 0x7a4e1c)).Center(0, 40, 600, 30);
-                Add(new TextBlock("Peichen Yao", 0x7a4e1c)).Center(0, 80, 600, 30);
+
+                Add(new TextBlock("Credits (Code)", 0x7a4e1c)).Center(-300, 160, 600, 60);
+                Add(new TextBlock("Peter Dobbins", 0x7a4e1c)).Center(-300, 80, 600, 30);
+                Add(new TextBlock("Astra Tsai", 0x7a4e1c)).Center(-300, 40, 600, 30);
+                Add(new TextBlock("Seeya Pillai", 0x7a4e1c)).Center(-300, 0, 600, 30);
+                Add(new TextBlock("Anson Fong", 0x7a4e1c)).Center(-300, -40, 600, 30);
+                Add(new TextBlock("Peichen Yao", 0x7a4e1c)).Center(-300, -80, 600, 30);
+                Add(new TextBlock("Prof. Markus Eger", 0x7a4e1c)).Center(-300, -120, 600, 30);
+
+                Add(new TextBlock("Credits (Art)", 0x7a4e1c)).Center(300, 160, 600, 60);
+                Add(new TextBlock("https://opengameart.org/content/dungeon-crawl-32x32-tiles", 0x7a4e1c)).Center(250, 80, 600, 20);
+                Add(new TextBlock("https://opengameart.org/content/roguelike-caves-dungeons-pack", 0x7a4e1c)).Center(250, 40, 600, 20);
+                Add(new TextBlock("https://kenney.nl/assets/roguelike-caves-dungeons", 0x7a4e1c)).Center(250, 0, 600, 20);
+                Add(new TextBlock("https://kenney.nl/assets/ui-pack-pixel-adventure", 0x7a4e1c)).Center(250, -40, 600, 20);
+                Add(new TextBlock("https://opengameart.org/content/tiny-creatures", 0x7a4e1c)).Center(250, -80, 600, 20);
+                Add(new TextBlock("https://opengameart.org/content/arcane-magic-effect", 0x7a4e1c)).Center(250, -120, 600, 20);
+
                 break;
             case "options":
                 Add(new ButtonBlock("Back", _ => { _ui.home_overlay = "home"; Refresh(); }).At(60, 60, 200, 50));
 
-                var sfx = AudioManager.Instance.sfxSource;
-                var music = AudioManager.Instance.musicSource;
-                Add(new TextBlock($"SFX Volume: {Math.Round(sfx.volume * 100)}%", 0x7a4e1c)).Center(-150, -40, 300, 30);
-                Add(new TextBlock($"Music Volume: {Math.Round(music.volume * 100)}%", 0x7a4e1c)).Center(-150, 40, 300, 30);
-                Add(new ButtonBlock("Mute", _ => { sfx.volume = 0; Refresh(); })).Center(50, -40, 90, 40);
-                Add(new ButtonBlock("Mute", _ => { music.volume = 0; Refresh(); })).Center(50, 40, 90, 40);
-                Add(new ButtonBlock("-", _ => { sfx.volume = Math.Clamp(sfx.volume - 0.1f, 0, 1); Refresh(); })).Center(125, -40, 40, 40);
-                Add(new ButtonBlock("-", _ => { music.volume = Math.Clamp(music.volume - 0.1f, 0, 1); Refresh(); })).Center(125, 40, 40, 40);
-                Add(new ButtonBlock("+", _ => { sfx.volume = Math.Clamp(sfx.volume + 0.1f, 0, 1); Refresh(); })).Center(175, -40, 40, 40);
-                Add(new ButtonBlock("+", _ => { music.volume = Math.Clamp(music.volume + 0.1f, 0, 1); Refresh(); })).Center(175, 40, 40, 40);
+                var am = AudioManager.Instance;
+                Add(new TextBlock($"SFX Volume: {Math.Round(am.SfxVolume * 100)}%", 0x7a4e1c)).Center(-150, 80, 300, 30);
+                Add(new TextBlock($"Music Volume: {Math.Round(am.MusicVolume * 100)}%", 0x7a4e1c)).Center(-150, 0, 300, 30);
+                Add(new ButtonBlock("Mute", _ => { am.SfxVolume = 0; Refresh(); })).Center(50, 80, 90, 40);
+                Add(new ButtonBlock("Mute", _ => { am.MusicVolume = 0; Refresh(); })).Center(50, 0, 90, 40);
+                Add(new ButtonBlock("-", _ => { am.SfxVolume = Math.Clamp(am.SfxVolume - 0.1f, 0, 1); Refresh(); })).Center(125, 80, 40, 40);
+                Add(new ButtonBlock("-", _ => { am.MusicVolume = Math.Clamp(am.MusicVolume - 0.1f, 0, 1); Refresh(); })).Center(125, 0, 40, 40);
+                Add(new ButtonBlock("+", _ => { am.SfxVolume = Math.Clamp(am.SfxVolume + 0.1f, 0, 1); Refresh(); })).Center(175, 80, 40, 40);
+                Add(new ButtonBlock("+", _ => { am.MusicVolume = Math.Clamp(am.MusicVolume + 0.1f, 0, 1); Refresh(); })).Center(175, 0, 40, 40);
+
+                var colorblindness = HealthBar.ColorBlindMode switch {
+                    1 => "Red-Green",
+                    2 => "Full",
+                    _ => "Off",
+                };
+                Add(new TextBlock($"Colorblindness Mode: {colorblindness}", 0x7a4e1c)).Center(-225, -80, 450, 30);
+                Add(new ButtonBlock("R/G", _ => { HealthBar.ColorBlindMode = 1; Refresh(); })).Center(50, -80, 90, 40);
+                Add(new ButtonBlock("Full", _ => { HealthBar.ColorBlindMode = 2; Refresh(); })).Center(150, -80, 90, 40);
+                Add(new ButtonBlock("Off", _ => { HealthBar.ColorBlindMode = 0; Refresh(); })).Center(250, -80, 90, 40);
+
                 break;
         }
     }
